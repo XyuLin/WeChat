@@ -13,7 +13,6 @@ use think\Validate;
  */
 class User extends Api
 {
-
     protected $noNeedLogin = ['login', 'mobilelogin', 'register', 'resetpwd', 'changeemail', 'changemobile', 'third'];
     protected $noNeedRight = '*';
 
@@ -172,7 +171,7 @@ class User extends Api
         $user->bio = $bio;
         $user->avatar = $avatar;
         $user->save();
-        $this->success();
+        $this->success('修改成功','','1');
     }
 
     /**

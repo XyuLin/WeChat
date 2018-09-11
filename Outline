@@ -1,0 +1,94 @@
+
+救命(位置){
+},
+会员 {
+    注册:{   * 服务条款, 隐私条款
+        'mobile': 手机号,
+        'password': 密码,
+        'pass_true': 确认密码,
+        'ver_code': 验证码,
+        'type': 分类 (注册/修改)
+    },
+    登录:{
+        'mobile': 手机号,
+        'password': 密码, or
+        'QQ': 第三方登录, or
+        'WeChat': 第三方登录, or
+    },
+    修改密码:{
+        'mobile': 手机号,
+        'passwrod': 新密码,
+        'pass_true': 确认新密码,
+        'ver_code': 验证码,
+        'type': 分类 (注册/修改)
+    },
+},
+社区(论坛) {
+    热门:{
+        banner: 轮播图,
+        attention: 我的关注板块,
+        popular: 热门文章
+    },
+    版块:{
+        section:{ // 所有版块
+            attention:{ // 我关注的版块
+                not_concerned: 未关注的,
+                concerned: 已关注的,
+            }
+        }
+        sectionDetail:{
+            recommend: 推荐的用户,
+            article: 文章,
+        },
+        articleDetail:{
+            userInfo: 用户信息,
+            publishTime: 发布时间
+            title: 标题,
+            content: 内容,
+            like: 点赞得人,
+            attention: 是否关注,
+            comment: 评论 回复 点赞,
+            position: 位置,
+        },
+        publish:{
+            title: 标题,
+            content: 内容,
+        }
+    },
+    个人中心:{
+        userInfo: 用户信息,
+        news: 新消息 {
+            systemNews: 系统消息 {
+                like: 点赞通知
+            },
+            reply: 回复的信息
+        },
+        myPosted: 我发布的 {
+            article: 我发布的文章,
+            reply: 回复信息(评论),
+        },
+        myCollection: 我收藏的,
+        myAttention: 我关注的,
+        myFans: 我的粉丝,
+    }
+},
+动动(任务){
+    护心任务:{
+        穴位按摩护心任务:{
+            'video': 视频,
+            'description': 描述,
+            'timer': 计时器,
+        },
+        运动保健护心任务:{
+
+        },
+        打卡记录:{
+
+        },
+    },
+}
+
+评论功能 {
+    一级评论：表情内容
+    回复
+}

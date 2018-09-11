@@ -274,7 +274,20 @@ class Backend extends Controller
                 $v = stripos($v, ".") === false ? $tableName . $v : $v;
             }
             unset($v);
-            $where[] = [implode("|", $searcharr), "LIKE", "%{$search}%"];
+            // 如果存在搜索分类id
+            if (in_array('block_category_id',$searcharr)) {
+                $exist = model('app\admin\model\block\Category')->where('title','LIKE',"%{$search}%")->column('id');
+                if ($exist != null && !empty($exist)) {
+                    $search = implode(',',$exist);
+                    $where[] = [implode("|", $searcharr), "IN", "$search"];
+                    // halt($where);
+                } else {
+                    $where[] = [implode("|", $searcharr), "LIKE", "%{$search}%"];
+                }
+            } else {
+                $where[] = [implode("|", $searcharr), "LIKE", "%{$search}%"];
+            }
+
         }
         foreach ($filter as $k => $v) {
             $sym = isset($op[$k]) ? $op[$k] : '=';

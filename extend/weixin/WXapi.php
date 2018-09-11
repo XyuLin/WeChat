@@ -13,8 +13,8 @@ class WXapi{
         // 服务号
         //'appID'     =>'wx057fc97a85beafc0',
         //'appsecret' =>'5d72c594b8f1ff2d73a69eeae621ae34',
-		'appID'        => 'wx057fc97a85beafc0',
-        'appsecret'    => '5d72c594b8f1ff2d73a69eeae621ae34',
+		'appID'        => 'wxa6733157e23b51e7',
+        'appsecret'    => 'd676967b3cc79626c78ae90977a39181',
     ];
 
 
