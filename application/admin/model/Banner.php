@@ -2,6 +2,7 @@
 
 namespace app\admin\model;
 
+use think\Config;
 use think\Model;
 
 class Banner extends Model
@@ -28,6 +29,22 @@ class Banner extends Model
             $pk = $row->getPk();
             $row->getQuery()->where($pk, $row[$pk])->update(['weigh' => $row[$pk]]);
         });
+    }
+
+    /**
+     *
+     */
+    public static function getBanner()
+    {
+
+        $banner = self::order('weigh','desc')->select();
+        // 拼接Url
+        $url = Config::get('url');
+        foreach($banner as $key => &$value) {
+            $value->image = $url . $value->image;
+        }
+        unset($value);
+        return collection($banner)->toArray();
     }
 
     

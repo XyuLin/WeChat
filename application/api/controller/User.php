@@ -5,7 +5,13 @@ namespace app\api\controller;
 use app\common\controller\Api;
 use app\common\library\Ems;
 use app\common\library\Sms;
+use app\common\model\Article;
+use app\common\model\Comment;
+use app\common\model\Follow;
+use app\common\model\Like;
 use fast\Random;
+use think\Db;
+use think\Exception;
 use think\Validate;
 
 /**
@@ -148,7 +154,7 @@ class User extends Api
 
     /**
      * 修改会员个人信息
-     * 
+     *
      * @param string $avatar 头像地址
      * @param string $username 用户名
      * @param string $nickname 昵称
@@ -349,6 +355,127 @@ class User extends Api
         {
             $this->error($this->auth->getError());
         }
+    }
+
+    // 关注用户或板块
+    public function follow()
+    {
+        $user = $this->auth->getUser();
+        $follow_id = $this->request->post('follow_id');
+        $type = $this->request->post('type');
+
+        $model = new Follow();
+        // 判断用户是否已经关注，已关注则取消关注
+        $params = [
+            'user_id'   => $user['id'],
+            'follow_id' => $follow_id,
+            'type'      => $type,
+        ];
+
+        if($id = $model->where($params)->value('id')) {
+            if($model->where('id',$id)->delete()) {
+                $msg = '取消关注成功';
+            } else {
+                $this->error('取消关注失败','');
+            }
+        } else {
+            if($model->create($params)) {
+                $msg = '关注成功';
+            } else {
+                $this->error('关注失败','');
+            }
+        }
+
+        $this->success($msg);
+    }
+
+    // 评论回复文章
+    public function comment()
+    {
+        // 获取登录用户信息
+        $user = $this->auth->getUser();
+        // 获取评论信息
+        $param = [
+            'article_id'    => 'id/d',
+            'comments'      => 'comments/s',
+            'parent_id'     => 'parent_id/d',
+        ];
+
+        $save_data = $this->buildParam($param);
+        $save_data['user_id'] = $user['id'];
+        // 验证parent_id 参数
+        if($save_data['parent_id'] != 0) {
+            $exist =Comment::get($save_data['parent_id']);
+            if(!$exist) $this->error('参数错误 - parent_id');
+        }
+        Db::startTrans();
+        try {
+            $comment = $this->editData(false,'Comment','Comment',$save_data);
+            if($comment['code'] == '1') {
+                // 评论成功，增加评论数
+                Article::plusLessOneType($save_data['article_id'],'comment','inc');
+            } else {
+                throw new Exception($comment['msg']);
+            }
+            Db::commit();
+        } catch (Exception $exception) {
+            Db::rollback();
+            $this->error($exception->getMessage());
+        }
+        $this->success($comment['msg']);
+
+    }
+
+    // 点赞
+    public function pointLike()
+    {
+        $user = $this->auth->getUser();
+        $param = [
+            'like_id'   => 'id/d',
+            'type'      => 'type/d'
+        ];
+
+        $save_data = $this->buildParam($param);
+        $save_data['user_id'] = $user['id'];
+
+        $model = new Like();
+        // 检测参数是否虚假
+        $exist = $model::isExist($save_data);
+        if(!$exist) $this->error('参数错误或缺少参数');
+        // 查询是否已经点赞，否则取消点赞
+        $detail = $model->where($save_data)->find();
+        $is_comment = $save_data['type'] == '2' ? true : false;
+        Db::startTrans();
+        try {
+            if($detail != null) {
+                if($model->where('id',$detail['id'])->delete()) {
+                    $result = Article::plusLessOneType($save_data['like_id'],'like','dec',$is_comment);
+                    if($result != true) {
+                        throw new Exception('减少点赞数量失败');
+                    }
+                    $msg = '取消点赞成功';
+                } else {
+                    // $this->error('取消点赞失败');
+                    throw new Exception('取消点赞失败');
+                }
+            } else {
+                if($model->allowField(true)->save($save_data)) {
+                    $result = Article::plusLessOneType($save_data['like_id'],'like','inc',$is_comment);
+                    if($result != true) {
+                        throw new Exception('增加点赞数量失败');
+                    }
+                    $msg = '点赞成功';
+                } else {
+                    // $this->error('点赞失败');
+                    throw new Exception('点赞失败');
+                }
+            }
+            Db::commit();
+        } catch (Exception $exception){
+            Db::rollback();
+            $this->error($exception->getMessage());
+        }
+        $this->success($msg);
     }
 
 }

@@ -18,6 +18,7 @@ use think\Response;
 class Api
 {
 
+    protected $url = 'http://localhost/wechat/public';
     /**
      * @var Request Request 实例
      */
@@ -324,4 +325,51 @@ class Api
         return true;
     }
 
+    /**
+     * 绑定数据
+     * @param $array
+     *
+     * @return array
+     */
+    protected function buildParam($array)
+    {
+        $data=[];
+        if (is_array($array)){
+            foreach( $array as $item=>$value ){
+                $data[$item] = $this->request->param($value);
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * 快速修改
+     * @param bool  $parameter
+     * @param bool  $validate_name
+     * @param bool  $model_name
+     * @param array $save_data
+     *
+     * @return mixed
+     */
+    protected function editData($parameter = false, $validate_name = false, $model_name = false, $save_data = [])
+    {
+        if (empty($save_data)) {
+            if ($parameter != false && is_array($parameter)) {
+                $data = $this->buildParam($parameter);
+            } else {
+                $data = $this->request->post();
+            }
+        } else {
+            $data = $save_data;
+        }
+        if (!$data) return ['code'=>'0','msg'=>'参数不能为空'];
+//        if ($validate_name != false) {
+//            $result = $this->validate($data, $validate_name);
+//            if (true !== $result) return $this->error($result);
+//        }
+        $model_edit = Loader::model($model_name);
+        //dump($model_edit);
+        if (!$model_edit) return ['code'=>'0','msg'=>'model不存在'];
+        return $model_edit->editData($data);
+    }
 }

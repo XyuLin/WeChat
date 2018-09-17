@@ -114,4 +114,18 @@ class User Extends Model
         return $level;
     }
 
+    public static function getUserList($ids)
+    {
+        $list = self::field('id,nickname,avatar')->where('id','in',$ids)->select();
+        $list = collection($list)->toArray();
+
+        $url = \think\Config::get('url');
+        foreach($list as &$item) {
+            $item['avatar'] = $url. $item['avatar'];
+        }
+        unset($item);
+
+        return $list;
+    }
+
 }
