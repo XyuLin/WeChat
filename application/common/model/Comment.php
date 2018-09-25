@@ -35,17 +35,13 @@ class Comment extends Model
         return $this->belongsTo('Article','article_id');
     }
 
-//    public function isLike($id,$user_id)
-//    {
-//
-//        $isExist = Like::where('type','2')->where('like_id',$data['id'])->find();
-//        if($isExist != null) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
+    // 是否点赞评论  参数如果用户
+    public static function isLike($array,$user_id)
+    {
+        $ids = pickIds($array);
+        $existIds = Like::where('user_id',$user_id)->where('like_id','in',$array)->where('type','2')->column('like_id');
+        $intersect = array_intersect($ids,$existIds);
 
-//    public function
+    }
 
 }

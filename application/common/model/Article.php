@@ -139,7 +139,7 @@ class Article extends Model
             'avatar'    =>  $detail->User->avatar,
         ];
         // 评论信息
-        $detail['comment'] = $detail->Comment;
+        $detail['comment'] = Comment::isLike($detail->Comment,$user_id);
         // 判断用户是否收藏，是否点赞，是，是否关注作者
         $detail['isFollow'] = Follow::isFollow($user_id,$detail['user_id'],'1');
         $detail['isCollection'] = Collection::isCollection($user_id,$detail['user_id']);
