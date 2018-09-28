@@ -39,9 +39,19 @@ class Comment extends Model
     public static function isLike($array,$user_id)
     {
         $ids = pickIds($array);
-        $existIds = Like::where('user_id',$user_id)->where('like_id','in',$array)->where('type','2')->column('like_id');
+        $existIds = Like::where('user_id',$user_id)->where('type','2')->where('like_id','in',$ids)->column('like_id');
         $intersect = array_intersect($ids,$existIds);
 
+        foreach ($array as $k => &$v) {
+            if(in_array($v['id'],$intersect)) {
+                $v['isLike'] = true;
+            } else {
+                $v['isLike'] = false;
+            }
+        }
+        unset($v);
+
+        return $array;
     }
 
 }
