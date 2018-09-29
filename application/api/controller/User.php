@@ -546,16 +546,24 @@ class User extends Api
         $this->success('文章发布成功!');
     }
 
-    // 我发布的文章
+    // 我他发布的文章
     public function getMyPublishArticle()
     {
         $user = $this->auth->getUser();
+        $user_id = $user->id;
         $page = $this->request->param('page/s');
+        if($his = $this->request->param('his/s')) {
+            $info = $user->where('id',$his)->find();
+            if($info == null) {
+                $this->error('参数错误(无效) - his');
+            } else {
+                $user_id = $info->id;
+            }
+        }
         $model = new Article();
-        $list = $model->getPublish($user['id'],$page);
+        $list = $model->getPublish($user_id,$page);
 
         $this->success('请求成功',$list);
-
     }
 
     // 我的回复
@@ -580,8 +588,21 @@ class User extends Api
         $this->success('请求成功',$list);
     }
 
-    // 我的关注
+    // 我的关注(粉丝)
+    // type = 1 我关注的人
+    // type = 2 关注我的人
+    public function getMyfollow()
+    {
+        $user = $this->auth->getUser();
+        $page = $this->request->param('page/s');
+        $type = $this->request->param('type/s');
 
-    // 我的粉丝
+        if($type != '1' && $type != 2) return $this->error('参数错误 - type ');
+
+        $model = new Follow();
+        $list = $model::getMyFans($user->id,$type,$page);
+
+        $this->success('请求成功',$list);
+    }
 
 }

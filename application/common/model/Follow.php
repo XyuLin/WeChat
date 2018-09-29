@@ -123,4 +123,47 @@ class Follow extends Model
         }
     }
 
+    public static function getMyFans($user_id,$type = '1',$page = '1')
+    {
+
+        $userModel = new User();
+        if($type == '2') {
+            $myFollowIds = self::where('type','1')->where('user_id',$user_id)->column('follow_id');
+            $followMyIds = self::where('type','1')
+                ->where('follow_id',$user_id)
+                ->limit('10')
+                ->page($page)
+                ->order('createtime','desc')
+                ->column('user_id');
+
+            $total = self::where('type','1')->where('follow_id',$user_id)->count();
+            $list = $userModel->getUserlist($followMyIds);
+
+            foreach ($list as $item => &$value) {
+                if(in_array($value['id'],$myFollowIds)) {
+                    $value['isFollow'] = true;
+                } else {
+                    $value['isFollow'] = false;
+                }
+            }
+            unset($value);
+        } else {
+            $myFollowIds = self::where('type','1')
+                ->where('user_id',$user_id)
+                ->limit('10')
+                ->page($page)
+                ->order('createtime','desc')
+                ->column('user_id');
+
+            $total = self::where('type','1')->where('user_id',$user_id)->count();
+            $list = $userModel->getUserlist($myFollowIds);
+        }
+        $data['list'] = $list;
+        $data['total'] = $total;
+        return $data;
+
+
+
+    }
+
 }
