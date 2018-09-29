@@ -12,6 +12,7 @@ use app\common\model\Comment;
 use app\common\model\Follow;
 use app\common\model\Like;
 use fast\Random;
+use think\Config;
 use think\Db;
 use think\Exception;
 use think\Validate;
@@ -34,7 +35,24 @@ class User extends Api
      */
     public function index()
     {
-        $this->success('', ['welcome' => $this->auth->nickname]);
+        $user = $this->auth->getUser();
+        // 统计吧
+        $article = Article::where('user_id',$user->id)->count();
+        $collection = Collection::where('user_id',$user->id)->count();
+        $follow = Follow::where('type','1')->where('user_id',$user->id)->count();
+        $fans = Follow::where('type','1')->where('follow_id',$user->id)->count();
+
+        $url = Config::get('url');
+        $data  = [
+            'nickname'  =>  $user->nickname,
+            'avatar'    =>  $url . $user->avatar,
+            'article'   =>  $article,
+            'collection'=>  $collection,
+            'follow'    =>  $follow,
+            'fans'      =>  $fans,
+        ];
+
+        $this->success('请求成功',$data);
     }
 
     /**
