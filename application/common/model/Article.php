@@ -20,14 +20,34 @@ class Article extends Model
     protected $createTime = 'createtime';
     protected $updateTime = 'updatetime';
 
+    protected $append = [
+        'create_text',
+        'block_category_text'
+    ];
+
+    public function getCreateTextAttr($value,$data)
+    {
+        return time_ago($data['createtime']);
+    }
+
     public function getCreatetimeAttr($value,$data)
     {
-        return time_ago($value);
+        return date('Y-m-d H:i',$value);
     }
 
     public function getUpdatetimeAttr($value,$data)
     {
         return date('Y-m-d H:i',$value);
+    }
+
+    public function getBlockCategoryTextAttr($value,$data)
+    {
+        $model = new BlockCategory();
+        if($name = $model->where('id',$data['block_category_id'])->value('title')) {
+            return $name;
+        } else {
+            return '';
+        }
     }
 
     public function User()
@@ -53,11 +73,14 @@ class Article extends Model
     {
         if($category_id != '') {
             $array = $this->where('block_category_id',$category_id)->limit('10')->page($page)->order('id desc')->select();
+            $total = $this->where('block_category_id',$category_id)->count();
         } else {
             $array = $this->limit('10')->page($page)->order('id desc')->select();
+            $total = $this->count();
         }
 
-        $data = $this->splicingUrl($array);
+        $data['list'] = $this->splicingUrl($array);
+        $data['total'] = $total;
         return $data;
     }
 
@@ -140,6 +163,8 @@ class Article extends Model
         ];
         // 评论信息
         $detail['comment'] = Comment::isLike($detail->Comment,$user_id);
+        // 点赞用户信息
+        $detail['likeUser'] = Like::LikeUser($detail['id']);
         // 判断用户是否收藏，是否点赞，是，是否关注作者
         $detail['isFollow'] = Follow::isFollow($user_id,$detail['user_id'],'1');
         $detail['isCollection'] = Collection::isCollection($user_id,$detail['user_id']);
@@ -188,5 +213,20 @@ class Article extends Model
         } else {
             return false;
         }
+    }
+
+    public function getPublish($user_id,$page = '1')
+    {
+        $list = $this->where('user_id',$user_id)
+            ->order('createtime','dsec')
+            ->limit('10')
+            ->page($page)
+            ->select();
+
+        $total = $this->where('user_id',$user_id)->count();
+
+        $data['list'] = $list;
+        $data['total'] = $total;
+        return $data;
     }
 }

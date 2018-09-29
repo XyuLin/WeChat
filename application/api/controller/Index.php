@@ -93,6 +93,7 @@ class Index extends Api
         $this->success('请求数据成功',$data);
     }
 
+    // 获取文章详情
     public function getArticleDetail()
     {
         $user = $this->auth->getUser();
@@ -103,5 +104,30 @@ class Index extends Api
         $detail = Article::getArticleDetail($article_id,$user['id']);
 
         $this->success('请求数据成功',$detail);
+    }
+
+    // 搜索文章
+    public function search()
+    {
+        $param = [
+            'keyWord'   => 'search/s',
+            'page'      => 'page/s'
+        ];
+        $param = $this->buildParam($param);
+        $model = new Article();
+        $where['title'] = ['like','%'.$param['keyWord'].'%'];
+        $list = $model->where($where)
+                ->limit('10')
+                ->page($param['page'])
+                ->order('createtime','desc')
+                ->select();
+        $total = $model->where($where)->count();
+
+        if(!empty($list)) {
+            $list = $model->splicingUrl($list);
+        }
+        $data['list'] = $list;
+        $data['total'] = $total;
+        $this->success('请求成功',$data);
     }
 }

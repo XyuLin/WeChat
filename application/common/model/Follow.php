@@ -21,6 +21,20 @@ class Follow extends Model
     protected $createTime = 'createtime';
     protected $updateTime = false;
 
+    protected $append = [
+        'create_text'
+    ];
+
+    public function getCreateTextAttr($value,$data)
+    {
+        return time_ago($data['createtime']);
+    }
+
+    public function getCreatetimeAttr($value,$data)
+    {
+        return date('Y-m-d H:i', $value);
+    }
+
     /**
      * @param        $user_id
      * @param string $type 1=关注的用户,2=关注的版块
@@ -86,7 +100,6 @@ class Follow extends Model
             }
         }
         unset($value);
-
         return $block;
     }
 

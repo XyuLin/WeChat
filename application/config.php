@@ -253,7 +253,7 @@ return [
         // 加密方式
         'hashalgo' => 'ripemd160',
         // 缓存有效期 0表示永久缓存
-        'expire'   => 0,
+        'expire'   => 86400,
     ],
     //FastAdmin配置
     'fastadmin'              => [

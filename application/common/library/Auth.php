@@ -111,7 +111,6 @@ class Auth
 
             //初始化成功的事件
             Hook::listen("user_init_successed", $this->_user);
-
             return TRUE;
         }
         else

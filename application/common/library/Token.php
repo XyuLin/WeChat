@@ -74,7 +74,6 @@ class Token
 
             self::$handler = self::connect($options);
         }
-
         return self::$handler;
     }
 

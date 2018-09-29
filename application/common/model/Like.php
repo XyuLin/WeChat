@@ -20,9 +20,18 @@ class Like extends Model
     protected $createTime = 'createtime';
     protected $updateTime = false;
 
+    protected $append = [
+        'create_text'
+    ];
+
+    public function getCreateTextAttr($value,$data)
+    {
+        return time_ago($data['createtime']);
+    }
+
     public function getCreatetimeAttr($value,$data)
     {
-        return time_ago($value);
+        return date('Y-m-d H:i', $value);
     }
 
     /**
@@ -45,7 +54,14 @@ class Like extends Model
         }
     }
 
-
+    /** 是否存在
+     * @param $data array
+     *
+     * @return bool
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public static function isExist($data)
     {
         if(!is_array($data)) return false;
@@ -61,5 +77,28 @@ class Like extends Model
         } else {
             return true;
         }
+    }
+
+    /** 点赞该文章的用户
+     * @param $article_id
+     *
+     * @return array|false|\PDOStatement|string|\think\Collection
+     */
+    public static function LikeUser($article_id)
+    {
+        $ids = self::where('type','1')
+            ->where('like_id',$article_id)
+            ->order('createtime','desc')
+            ->column('user_id');
+
+        if(!empty($ids)) {
+            $userModel = new User();
+            $userList = $userModel::getUserList($ids);
+            return $userList;
+        } else {
+            return [];
+        }
+
+
     }
 }

@@ -6,6 +6,8 @@ use app\common\controller\Api;
 use app\common\library\Ems;
 use app\common\library\Sms;
 use app\common\model\Article;
+use app\common\model\BlockCategory;
+use app\common\model\Collection;
 use app\common\model\Comment;
 use app\common\model\Follow;
 use app\common\model\Like;
@@ -389,6 +391,36 @@ class User extends Api
         $this->success($msg);
     }
 
+    // 关注用户或板块
+    public function collection()
+    {
+        $user = $this->auth->getUser();
+        $article_id = $this->request->post('article_id');
+
+        $model = new Collection();
+        // 判断用户是否已经关注，已关注则取消关注
+        $params = [
+            'user_id'   => $user['id'],
+            'article_id' => $article_id,
+        ];
+
+        if($id = $model->where($params)->value('id')) {
+            if($model->where('id',$id)->delete()) {
+                $msg = '取消收藏成功';
+            } else {
+                $this->error('取消收藏失败','');
+            }
+        } else {
+            if($model->create($params)) {
+                $msg = '收藏成功';
+            } else {
+                $this->error('收藏失败','');
+            }
+        }
+
+        $this->success($msg);
+    }
+
     // 评论回复文章
     public function comment()
     {
@@ -405,7 +437,7 @@ class User extends Api
         $save_data['user_id'] = $user['id'];
         // 验证parent_id 参数
         if($save_data['parent_id'] != 0) {
-            $exist =Comment::get($save_data['parent_id']);
+            $exist = Comment::get($save_data['parent_id']);
             if(!$exist) $this->error('参数错误 - parent_id');
         }
         Db::startTrans();
@@ -477,5 +509,79 @@ class User extends Api
         }
         $this->success($msg);
     }
+
+    // 发表文章
+    public function publishArticle()
+    {
+        $user = $this->auth->getUser();
+        $param = [
+            'block_category_id' => 'category_id/s',
+            'title'             => 'title/s',
+            'content'           => 'content/s',
+            'images'            => 'image/a'
+        ];
+        $save_data = $this->buildParam($param);
+        // 判断用户传入的模型id 是否存在
+        $block_category = new BlockCategory();
+        if(!$block_category->where('id',$save_data['block_category_id'])->find()) {
+            $this->error('参数错误 - category_id');
+        }
+        $save_data['images'] = implode(',',$save_data['images']);
+        $save_data['user_id'] = $user['id'];
+
+        Db::startTrans();
+        try {
+            $result = $this->editData(false, 'Article', 'Article',$save_data);
+            if($result['code'] == '1') {
+                // 需要加入定位。
+            } else {
+                throw new Exception($result['msg']);
+            }
+            Db::commit();
+        } catch (Exception $exception) {
+            Db::rollback();
+            $this->error($exception->getMessage());
+        }
+
+        $this->success('文章发布成功!');
+    }
+
+    // 我发布的文章
+    public function getMyPublishArticle()
+    {
+        $user = $this->auth->getUser();
+        $page = $this->request->param('page/s');
+        $model = new Article();
+        $list = $model->getPublish($user['id'],$page);
+
+        $this->success('请求成功',$list);
+
+    }
+
+    // 我的回复
+    public function getMyComment()
+    {
+        $user = $this->auth->getUser();
+        $page = $this->request->param('page/s');
+        $model = new Comment();
+        $list = $model->getComment($user['id'],$page);
+
+        $this->success('请求成功',$list);
+    }
+
+    // 我的收藏
+    public function getMyCollection()
+    {
+        $user = $this->auth->getUser();
+        $page = $this->request->param('page/s');
+        $model = new Collection();
+        $list = $model->getCollection($user['id'],$page);
+
+        $this->success('请求成功',$list);
+    }
+
+    // 我的关注
+
+    // 我的粉丝
 
 }

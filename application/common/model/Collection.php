@@ -20,10 +20,20 @@ class Collection extends Model
     protected $createTime = 'createtime';
     protected $updateTime = false;
 
+    protected $append = [
+        'create_text'
+    ];
+
+    public function getCreateTextAttr($value,$data)
+    {
+        return time_ago($data['createtime']);
+    }
+
     public function getCreatetimeAttr($value,$data)
     {
-        return time_ago($value);
+        return date('Y-m-d H:i', $value);
     }
+
 
     /**
      * @param $user_id
@@ -42,6 +52,28 @@ class Collection extends Model
         } else {
             return false;
         }
+    }
+
+    public function getCollection($user_id, $page = '1')
+    {
+        $ids = $this->where('user_id',$user_id)
+            ->limit('10')
+            ->page($page)
+            ->order('createtime','desc')
+            ->column('article_id');
+        $total = $this->where('user_id',$user_id)->count();
+
+        if(!empty($ids)){
+            $model = new Article();
+            $list = $model->where('id','in',$ids)->select();
+            $list = $model->splicingUrl($list);
+        } else {
+            $list  = [];
+        }
+
+        $data['list'] = $list;
+        $data['total'] = $total;
+        return $data;
     }
 
 }
