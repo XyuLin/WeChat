@@ -4,10 +4,6 @@ return array (
   'autoload' => false,
   'hooks' => 
   array (
-    'admin_login_init' => 
-    array (
-      0 => 'loginbg',
-    ),
     'upload_after' => 
     array (
       0 => 'thumb',
@@ -21,5 +17,8 @@ return array (
     '/example/d2/[:name]' => 'example/demo/demo2',
     '/qrcode$' => 'qrcode/index/index',
     '/qrcode/build$' => 'qrcode/index/build',
+    '/third$' => 'third/index/index',
+    '/third/connect/[:platform]' => 'third/index/connect',
+    '/third/callback/[:platform]' => 'third/index/callback',
   ),
 );

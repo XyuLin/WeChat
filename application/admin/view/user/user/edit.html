@@ -50,7 +50,7 @@
             <ul class="row list-inline plupload-preview" id="p-avatar"></ul>
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group" style="display: none;">
         <label for="c-level" class="control-label col-xs-12 col-sm-2">{:__('Level')}:</label>
         <div class="col-xs-12 col-sm-4">
             <input id="c-level" data-rule="required" class="form-control" name="row[level]" type="number" value="{$row.level}">
@@ -60,6 +60,30 @@
         <label for="c-gender" class="control-label col-xs-12 col-sm-2">{:__('Gender')}:</label>
         <div class="col-xs-12 col-sm-8">
             {:build_radios('row[gender]', ['1'=>__('Male'), '0'=>__('Female')], $row['gender'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-address" class="control-label col-xs-12 col-sm-2">{:__('Address')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-address" data-rule="" class="form-control" name="row[address]" type="text" value="{$row.address}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-age" class="control-label col-xs-12 col-sm-2">{:__('Age')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-age" data-rule="" class="form-control" name="row[age]" type="text" value="{$row.age}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-weight" class="control-label col-xs-12 col-sm-2">{:__('Weight')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-weight" data-rule="" class="form-control" name="row[weight]" type="text" value="{$row.weight}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-height" class="control-label col-xs-12 col-sm-2">{:__('Height')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-height" data-rule="" class="form-control" name="row[height]" type="text" value="{$row.height}">
         </div>
     </div>
     <div class="form-group">
@@ -74,7 +98,7 @@
             <input id="c-bio" data-rule="" class="form-control" name="row[bio]" type="text" value="{$row.bio}">
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group" style="display: none;">
         <label for="c-score" class="control-label col-xs-12 col-sm-2">{:__('Score')}:</label>
         <div class="col-xs-12 col-sm-4">
             <input id="c-score" data-rule="required" class="form-control" name="row[score]" type="number" value="{$row.score}">

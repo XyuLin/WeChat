@@ -3,6 +3,7 @@
 namespace app\common\library;
 
 use think\Hook;
+use think\Request;
 
 /**
  * 短信验证码类
@@ -14,13 +15,13 @@ class Sms
      * 验证码有效时长
      * @var int 
      */
-    protected static $expire = 120;
+    protected static $expire = 300;
 
     /**
      * 最大允许检测的次数
      * @var int 
      */
-    protected static $maxCheckNums = 10;
+    protected static $maxCheckNums = 5;
 
     /**
      * 获取最后一次手机发送的数据
@@ -53,8 +54,11 @@ class Sms
         $time = time();
         $ip = request()->ip();
         $sms = \app\common\model\Sms::create(['event' => $event, 'mobile' => $mobile, 'code' => $code, 'ip' => $ip, 'createtime' => $time]);
-        $result = Hook::listen('sms_send', $sms, null, true);
-        if (!$result)
+        // $result = Hook::listen('sms_send', $sms, null, true);
+
+        $result = self::smsSend($mobile,$code);
+        $result = json_decode($result,true);
+        if ($result['result'] != '0')
         {
             $sms->delete();
             return FALSE;
@@ -108,8 +112,9 @@ class Sms
                 }
                 else
                 {
-                    $result = Hook::listen('sms_check', $sms, null, true);
-                    return $result;
+
+                    // $result = Hook::listen('sms_check', $sms, null, true);
+                    return TRUE;
                 }
             }
             else
@@ -139,6 +144,38 @@ class Sms
                 ->delete();
         Hook::listen('sms_flush');
         return TRUE;
+    }
+
+    /**
+     * @param $mobile
+     * @param $code
+     */
+    protected static function smsSend($mobile, $code)
+    {
+        $post_data = array();
+        $post_data['account'] = "Thxy2018_cprtz";
+        $post_data['pswd'] = "Cprtz2018@";
+        $post_data['mobile'] = $mobile;
+        $post_data['msg']= "您的验证码为".$code."五分钟内有效";
+        $post_data['needstatus'] = "true";
+        $post_data['resptype'] = 'json';
+        $url='http://114.55.25.138/msg/HttpBatchSendSM';
+        $o = "";
+        foreach ($post_data as $k=>$v)
+        {
+            $o.= "$k=".urlencode($v)."&";
+        }
+        $post_data = substr($o,0,-1);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+        return $result;
+
     }
 
 }

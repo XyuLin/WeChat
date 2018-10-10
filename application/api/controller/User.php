@@ -7,6 +7,7 @@ use app\common\library\Ems;
 use app\common\library\Sms;
 use app\common\model\Article;
 use app\common\model\BlockCategory;
+use app\common\model\Care;
 use app\common\model\Collection;
 use app\common\model\Comment;
 use app\common\model\Follow;
@@ -15,6 +16,7 @@ use fast\Random;
 use think\Config;
 use think\Db;
 use think\Exception;
+use think\Hook;
 use think\Validate;
 
 /**
@@ -53,6 +55,45 @@ class User extends Api
         ];
 
         $this->success('请求成功',$data);
+    }
+
+    /**
+     * 获取用户信息
+     */
+    public function getUserInfo()
+    {
+        $userInfo = $this->auth->getUserinfo();
+        $this->success('请求成功',$userInfo);
+    }
+
+    /**
+     * 修改个人信息
+     */
+    public function editUserInfo()
+    {
+        $user = $this->auth->getUser();
+        $param = [
+            'nickname'              => 'nickname/s',
+            'gender'                => 'sex/d',
+            'age'                   => 'age/s',
+            'height'                => 'height/s',
+            'weight'                => 'weight/s',
+            'blood_type'            => 'blood/d',
+            'address'               => 'address/s',
+            'urgent_phone_one'      => 'one_phone/s',
+            'urgent_contact_one'    => 'one_contact/s',
+            'urgent_phone_two'      => 'two_phone/s',
+            'urgent_contact_two'    => 'two_contact/s',
+        ];
+
+        $save_param = array_filter($this->buildParam($param));
+        $save_param['id'] = $user['id'];
+        $result = $this->editData(false,false,'User',$save_param);
+        if($result['code'] == '1') {
+            $this->success($result['msg']);
+        } else {
+            $this->error($result['msg']);
+        }
     }
 
     /**
@@ -293,6 +334,7 @@ class User extends Api
             $this->error(__('Invalid parameters'));
         }
         $app = new \addons\third\library\Application($config);
+
         //通过code换access_token和绑定会员
         $result = $app->{$platform}->getUserInfo(['code' => $code]);
         if ($result)
@@ -621,6 +663,158 @@ class User extends Api
         $list = $model::getMyFans($user->id,$type,$page);
 
         $this->success('请求成功',$list);
+    }
+
+    /**
+     *  我牵挂的人
+     */
+    public function getMyCare()
+    {
+        $user = $this->auth->getUser();
+        $model = new Care();
+        $myCare = $model->where('user_id',$user['id'])->where('adopt','2')->column('care_id,memo_name');
+        $ids = array_keys($myCare);
+        $list = \app\common\model\User::getUserList($ids);
+        foreach ($list as $key => &$value) {
+                $value['memo_name'] = $myCare[$value['id']];
+        }
+        unset($value);
+        $this->success('请求成功', $list);
+    }
+
+    /**
+     * 添加牵挂的人
+     */
+    public function addCare()
+    {
+        $user = $this->auth->getUser();
+        $care_id = $this->request->param('care_id');
+        $tips = $this->request->param('tips');
+        if($user['id'] == $care_id) $this->error('不可添加自己为牵挂的人!');
+        $care = $user->where('id',$care_id)->find();
+        if(empty($care)) $this->error('参数错误, 没有此用户');
+        $model = new Care();
+        $param = [
+            'care_id'   => $care_id,
+            'user_id'   => $user['id'],
+        ];
+        $isExist = $model->where($param)->select();
+        if($isExist != null) {
+            $this->error('用户已添加过 '.$care['nickname'].' 请勿重复添加');
+        }
+        $param = array_merge($param,[
+            'memo_name' => $care['nickname'],
+            'tips'      => $tips,
+        ]);
+        $result = $model->allowField(true)->save($param);
+        if($result != false) {
+            $this->success('添加牵挂的人成功!');
+        } else {
+            $this->error('添加牵挂的人失败!');
+        }
+    }
+
+    /**
+     * 新的牵挂
+     * adopt 0 未通过 1 已拒绝 2 已通过
+     */
+    public function newCare()
+    {
+        $user = $this->auth->getUser();
+        $model = new Care();
+        $list = $model->where('care_id',$user['id'])->select();
+        $this->success('请求成功',$list);
+    }
+
+    /**
+     * 同意用户牵挂
+     */
+    public function confirmAdopt()
+    {
+        $user = $this->auth->getUser();
+        $id = $this->request->param('care_id');
+        $operate = $this->request->param('operate');
+        if($operate == 'true') {
+            $operate = '2';
+        } else {
+            $operate = '1';
+        }
+        $model = new Care();
+        $info = $model->find($id);
+        if(empty($info)) $this->error('参数错误 - care_id');
+        if($info['adopt'] != 0) $this->error('不可重复操作!');
+        $info->adopt = $operate;
+        if($info->save() > 0) {
+            $this->success('通过成功!');
+        } else {
+            $this->error('操作失败!');
+        }
+    }
+
+    /**
+     * 查找(查看)牵挂的人信息
+     */
+
+    public function getCareInfo()
+    {
+        $user = $this->auth->getUser();
+        $str = $this->request->param('only');
+        $isNum = preg_match('/[0-9]/', $str);
+        if($isNum) {
+            if(strlen($str) == 11) {
+                $where['mobile'] = $str;
+            } else {
+                $where['id'] = $str;
+            }
+        } else {
+            $where['uuid'] = ['like','%'.$str.'%'];
+        }
+        $model = new \app\common\model\User();
+        $ids = $model->where($where)->value('id');
+        if(empty($ids)) {
+            $this->error('没有此用户!');
+        } else {
+            // 判断是否已经为好友。或者是需要添加
+            $userInfo = $model::getUserList($ids);
+            $isExist = Care::where('user_id',$user['id'])->where('care_id',$ids)->find();
+            if($isExist) {
+                $isCare = 'true';
+            } else {
+                if($ids == $user['id']) {
+                    $isCare = 'true';
+                } else {
+                    $isCare = 'false';
+                }
+            }
+            $data = array_merge($userInfo[0],[
+                'isCare' => $isCare,
+            ]);
+            $this->success('请求成功',$data);
+        }
+    }
+
+    /**
+     * 修改牵挂的人备注名
+     *
+     */
+    public function editMemoName()
+    {
+        $user = $this->auth->getUser();
+        $id = $this->request->param('care_id');
+        $name = $this->request->param('name');
+        $model = new Care();
+
+        $info = $model->where('id',$id)->where('user_id',$user['id'])->find();
+        if(empty($info)) {
+            $this->error('参数错误 - care_id');
+        } else {
+            $info->memo_name = $name;
+            if($info->save() > 0) {
+                $this->success('修改成功');
+            } else {
+                $this->error('修改失败,请重试!');
+            }
+        }
     }
 
 }

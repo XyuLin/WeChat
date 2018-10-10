@@ -34,7 +34,8 @@ class Article extends Model
 
     public function getBlockCategoryTitleAttr()
     {
-        if($this->BlockCategory() != null) {
+        // dump($this->BlockCategory);
+        if($this->BlockCategory != null) {
             return $this->BlockCategory->title;
         } else {
             return '此类型已删除!';
@@ -43,7 +44,7 @@ class Article extends Model
 
     public function getUserNameAttr()
     {
-        if($this->User() != null) {
+        if($this->User != null) {
             return $this->User->nickname;
         } else {
             return '此会员以注销';

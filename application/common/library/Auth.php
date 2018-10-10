@@ -26,7 +26,8 @@ class Auth
     //默认配置
     protected $config = [];
     protected $options = [];
-    protected $allowFields = ['id', 'username', 'nickname', 'mobile', 'avatar', 'score'];
+    protected $allowFields = ['id', 'username', 'nickname', 'mobile', 'avatar', 'weight','height','age',
+        'address','gender','urgent_phone_one','urgent_contact_one','urgent_contact_two','urgent_phone_two','blood_type'];
 
     public function __construct($options = [])
     {
@@ -416,6 +417,16 @@ class Auth
         $allowFields = $this->getAllowFields();
         $userinfo = array_intersect_key($data, array_flip($allowFields));
         $userinfo = array_merge($userinfo, Token::get($this->_token));
+
+        $gender_text = ['0'=>'未选择','1'=>'男','2'=>'女'];
+        $blood_type = ['1'=>'A型血','2'=>'B型血','3'=>'AB型血','4'=>'O型血'];
+        $url = Config::get('url');
+        $additional = [
+            'gander_name'   => $gender_text[$userinfo['gender']],
+            'blood_name'    => $blood_type[$userinfo['blood_type']],
+            'avatar_url'    => $url . $userinfo['avatar'],
+        ];
+        $userinfo = array_merge($userinfo,$additional);
         return $userinfo;
     }
 
