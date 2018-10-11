@@ -176,23 +176,28 @@ class User extends Api
      */
     public function register()
     {
-        $username = $this->request->request('username');
+        // $username = $this->request->request('username');
         $password = $this->request->request('password');
-        $email = $this->request->request('email');
+        // $email = $this->request->request('email');
         $mobile = $this->request->request('mobile');
-        if (!$username || !$password)
+        $code = $this->request->request('code');
+        if (!$password)
         {
             $this->error(__('Invalid parameters'));
         }
-        if ($email && !Validate::is($email, "email"))
-        {
-            $this->error(__('Email is incorrect'));
-        }
+//        if ($email && !Validate::is($email, "email"))
+//        {
+//            $this->error(__('Email is incorrect'));
+//        }
         if ($mobile && !Validate::regex($mobile, "^1\d{10}$"))
         {
             $this->error(__('Mobile is incorrect'));
         }
-        $ret = $this->auth->register($username, $password, $email, $mobile, []);
+        $result = Sms::check($mobile,$code,'register');
+        if(!$result) {
+            $this->error('验证码错误');
+        }
+        $ret = $this->auth->register($password,$mobile, []);
         if ($ret)
         {
             $data = ['userinfo' => $this->auth->getUserinfo()];

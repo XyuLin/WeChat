@@ -124,26 +124,24 @@ class Auth
     /**
      * 注册用户
      *
-     * @param string $username  用户名
      * @param string $password  密码
-     * @param string $email     邮箱
      * @param string $mobile    手机号
      * @param array $extend    扩展参数
      * @return boolean
      */
-    public function register($username, $password, $email = '', $mobile = '', $extend = [])
+    public function register($password,$mobile = '', $extend = [])
     {
         // 检测用户名或邮箱、手机号是否存在
-        if (User::getByUsername($username))
-        {
-            $this->setError('Username already exist');
-            return FALSE;
-        }
-        if ($email && User::getByEmail($email))
-        {
-            $this->setError('Email already exist');
-            return FALSE;
-        }
+//        if (User::getByUsername($username))
+//        {
+//            $this->setError('Username already exist');
+//            return FALSE;
+//        }
+//        if ($email && User::getByEmail($email))
+//        {
+//            $this->setError('Email already exist');
+//            return FALSE;
+//        }
         if ($mobile && User::getByMobile($mobile))
         {
             $this->setError('Mobile already exist');
@@ -154,16 +152,16 @@ class Auth
         $time = time();
 
         $data = [
-            'username' => $username,
+            'username' => '',
             'password' => $password,
-            'email'    => $email,
+            'email'    => '',
             'mobile'   => $mobile,
             'level'    => 1,
             'score'    => 0,
             'avatar'   => '',
         ];
         $params = array_merge($data, [
-            'nickname'  => $username,
+            'nickname'  => '',
             'salt'      => Random::alnum(),
             'jointime'  => $time,
             'joinip'    => $ip,
