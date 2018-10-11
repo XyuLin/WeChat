@@ -1,5 +1,6 @@
 /runtime/*
 /public/uploads/*
+/application/database.php
 .idea
 composer.lock
 *.log
