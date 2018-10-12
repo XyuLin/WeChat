@@ -12,6 +12,7 @@ use app\common\model\Collection;
 use app\common\model\Comment;
 use app\common\model\Follow;
 use app\common\model\Like;
+use app\common\model\News;
 use fast\Random;
 use think\Config;
 use think\Db;
@@ -511,6 +512,10 @@ class User extends Api
             if($comment['code'] == '1') {
                 // 评论成功，增加评论数
                 Article::plusLessOneType($save_data['article_id'],'comment','inc');
+                $message = News::addNewMessage($save_data['user_id'],'3',$save_data['article_id'],$comment['data']->id);
+                if($message->getCustomError()) {
+                    throw new Exception($message->getCustomError());
+                }
             } else {
                 throw new Exception($comment['msg']);
             }
@@ -560,6 +565,12 @@ class User extends Api
                     $result = Article::plusLessOneType($save_data['like_id'],'like','inc',$is_comment);
                     if($result != true) {
                         throw new Exception('增加点赞数量失败');
+                    }
+                    if($is_comment == false) {
+                        $message = News::addNewMessage($save_data['user_id'],'1',$save_data['like_id'],$model->id);
+                        if($message->getCustomError()) {
+                            throw new Exception($message->getCustomError());
+                        }
                     }
                     $msg = '点赞成功';
                 } else {
@@ -820,6 +831,40 @@ class User extends Api
                 $this->error('修改失败,请重试!');
             }
         }
+    }
+
+    /**
+     * 查看信息
+     */
+    public function viewMessage()
+    {
+        $user = $this->auth->getUser();
+        $news_id = $this->request->param('news_id');
+        $result = News::viewMessage($user['id'],$news_id);
+        if($result->getCustomError()) {
+            $this->error($result->getCustomError());
+        } else {
+            if($result->type == '3') {
+                $article = Article::getArticleDetail($result->article_id,$user['id']);
+                $this->success('请求成功',$article);
+            } else {
+                $this->success('请求成功!');
+            }
+        }
+    }
+
+    /**
+     * 我的新消息
+     */
+    public function getMyMessages()
+    {
+        $user = $this->auth->getUser();
+        $type = $this->request->param('type/s');
+        $News = new News;
+        $result = $News->getMyMessage($user['id'],$type);
+
+        $this->success('请求成功',$result);
+
     }
 
 }

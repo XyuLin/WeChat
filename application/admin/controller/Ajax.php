@@ -48,6 +48,7 @@ class Ajax extends Backend
     {
         Config::set('default_return_type', 'json');
         $file = $this->request->file('file');
+        // halt($file);
         if (empty($file)) {
             $this->error(__('No file upload or server upload limit exceeded'));
         }
@@ -62,6 +63,7 @@ class Ajax extends Backend
         $typeDict = ['b' => 0, 'k' => 1, 'kb' => 1, 'm' => 2, 'mb' => 2, 'gb' => 3, 'g' => 3];
         $size = (int)$upload['maxsize'] * pow(1024, isset($typeDict[$type]) ? $typeDict[$type] : 0);
         $fileInfo = $file->getInfo();
+        // halt($fileInfo);
         $suffix = strtolower(pathinfo($fileInfo['name'], PATHINFO_EXTENSION));
         $suffix = $suffix ? $suffix : 'file';
 

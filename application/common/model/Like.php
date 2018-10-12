@@ -34,6 +34,11 @@ class Like extends Model
         return date('Y-m-d H:i', $value);
     }
 
+    public function Article()
+    {
+        return $this->belongsTo('Article','like_id');
+    }
+
     /**
      * @param $user_id
      * @param like_id

@@ -60,6 +60,16 @@ class Article extends Model
         return $this->hasMany('Comment');
     }
 
+//    public function Like()
+//    {
+//        return $this->hasMany('Like','like_id');
+//    }
+//
+//    public function Share()
+//    {
+//        return $this->hasMany('Share');
+//    }
+
     /**
      * @param string $category_id
      * @param string $page

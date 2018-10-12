@@ -51,6 +51,8 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
     private static $event = [];
     // 错误信息
     protected $error;
+    // 自定义错误信息
+    protected $customError;
     // 字段验证规则
     protected $validate;
     // 数据表主键 复合主键使用数组定义 不设置则自动获取
@@ -1595,6 +1597,26 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
     }
 
     /**
+     * 返回模型的错误信息
+     * @access public
+     * @return string|array
+     */
+    public function getCustomError()
+    {
+        return $this->customError;
+    }
+
+    /**
+     * 设置模型的错误信息
+     * @access public
+     * @return string|array
+     */
+    public function setCustomError($error)
+    {
+        return $this->customError = $error;
+    }
+
+    /**
      * 注册回调方法
      * @access public
      * @param string   $event    事件名
@@ -2342,9 +2364,9 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
             $save  = $this->allowField(true)->save($data);
         }
         if ( $save == 0 || $save == false) {
-            $res=[  'code'=> 0,  'msg' => '数据更新失败', ];
+            $res=[  'code'=> 0,  'msg' => '数据更新失败' ,'data' => $this];
         }else{
-            $res=[  'code'=> 1,  'msg' => '数据更新成功',  ];
+            $res=[  'code'=> 1,  'msg' => '数据更新成功' ,'data' => $this];
         }
         return $res;
     }
