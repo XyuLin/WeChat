@@ -45,6 +45,13 @@ class Motion extends Api
 
     public function punchTheClock()
     {
-        
+        $user = $this->auth->getUser();
+        $time = time();
+        $param['year'] = date('Y',$time);
+        $param['month'] = date('m',$time);
+        $param['day']   = date('d',$time);
+        $param['user_id'] = $user->id;
+
+        $this->success('OK', $param);
     }
 }

@@ -358,6 +358,12 @@ class User extends Api
         $this->error(__('Operation failed'), $url);
     }
 
+
+    public function thirdParty()
+    {
+
+    }
+
     /**
      * 重置密码
      * 

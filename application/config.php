@@ -277,5 +277,5 @@ return [
         //'api_url'             => 'http://localhost/wechat/public'
         'api_url'             => 'https://api.fastadmin.net',
     ],
-    'url'                     => 'http://localhost/wechat/public',
+    'url'                     => 'http://49.4.70.109/handring/public',
 ];
