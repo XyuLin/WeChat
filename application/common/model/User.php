@@ -2,6 +2,7 @@
 
 namespace app\common\model;
 
+use Endroid\QrCode\QrCode;
 use think\Model;
 
 /**
@@ -126,6 +127,32 @@ class User Extends Model
         unset($item);
 
         return $list;
+    }
+
+    public static function createCode($id)
+    {
+        $user = new User();
+        $user = $user->where('id',$id)->find();
+
+        $qrCode = new QrCode();
+
+        $text = url('index/index/build',['code'=>'code'],'.html','http://www.teawant8.com');
+        $qrCode
+            ->setText($text)
+            ->setSize('500')
+            ->setPadding('15')
+            ->setErrorCorrection('0')
+            // ->setLogoSize('50')
+            ->setLabelFontPath(ROOT_PATH . 'public/assets/fonts/fzltxh.ttf')
+            //->setLabel('李琳')
+            // ->setLabelFontSize('25')
+            // ->setLabelHalign('0')
+            // ->setLabelValign('2')
+            ->setImageType($qrCode::IMAGE_TYPE_PNG);
+        // dump($this->auth->avatar);die;
+        // $qrCode->setLogo(ROOT_PATH . 'public' . $this->auth->avatar);
+        $qrCode->save(ROOT_PATH. 'public/qrCode/'.$user->id .'.jpg');
+        //return new \think\Response($qrCode->get(), 200, ['Content-Type' => $qrCode->getContentType()]);
     }
 
 }

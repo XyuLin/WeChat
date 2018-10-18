@@ -40,6 +40,11 @@ class Num extends Model
             $this->setCustomError('不可重复打卡!');
             return $this;
         }
+        $isBeyond = $this->where('day',$param['day'])->count('id');
+        if($isBeyond == '5') {
+            $this->setCustomError('打卡次数以用完!');
+            return $this;
+        }
         $result = $this->create($param);
         if($result->id > 0 ) {
             return $result;

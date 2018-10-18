@@ -195,6 +195,7 @@ class Auth
         try
         {
             $user = User::create($params);
+            User::createCode($user->id);
             Db::commit();
 
             // 此时的Model中只包含部分数据

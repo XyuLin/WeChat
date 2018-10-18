@@ -11,6 +11,7 @@ namespace app\api\controller;
 
 use app\common\controller\Api;
 use app\common\model\motion\Module;
+use app\common\model\motion\Num;
 
 class Motion extends Api
 {
@@ -43,15 +44,37 @@ class Motion extends Api
         $this->success('请求成功!', $data);
     }
 
+    /**
+     * 打卡
+     */
     public function punchTheClock()
     {
         $user = $this->auth->getUser();
-        $time = time();
-        $param['year'] = date('Y',$time);
-        $param['month'] = date('m',$time);
-        $param['day']   = date('d',$time);
+        $param = [
+            'task_id'   => 'task_id/s',
+        ];
+        $param = $this->buildParam($param);
         $param['user_id'] = $user->id;
 
-        $this->success('OK', $param);
+        $model = new Num();
+        $result = $model->punchTheClock($param);
+        if($result->getCustomError()) {
+            $this->error($result->getCustomError());
+        } else {
+            $this->success('打卡成功!');
+        }
+    }
+
+    public function getRecord()
+    {
+        $user = $this->auth->getUser();
+        $model = new Num();
+        $result = $model->getUserRecord($user->id);
+        $this->success('请求成功!',$result);
+    }
+
+    public function qrcode()
+    {
+        $abc = \app\common\model\User::createCode('2');
     }
 }
