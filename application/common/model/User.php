@@ -117,12 +117,13 @@ class User Extends Model
 
     public static function getUserList($ids)
     {
-        $list = self::field('id,nickname,avatar')->where('id','in',$ids)->select();
+        $list = self::field('id,nickname,avatar,gender')->where('id','in',$ids)->select();
         $list = collection($list)->toArray();
 
         $url = \think\Config::get('url');
         foreach($list as &$item) {
             $item['avatar'] = $url. $item['avatar'];
+            $item['gender_text'] = $item['gender'] == '1' ? '男':'女';
         }
         unset($item);
 

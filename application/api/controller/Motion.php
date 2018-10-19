@@ -73,8 +73,4 @@ class Motion extends Api
         $this->success('请求成功!',$result);
     }
 
-    public function qrcode()
-    {
-        $abc = \app\common\model\User::createCode('2');
-    }
 }

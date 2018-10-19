@@ -85,6 +85,7 @@ class User extends Api
             'urgent_contact_one'    => 'one_contact/s',
             'urgent_phone_two'      => 'two_phone/s',
             'urgent_contact_two'    => 'two_contact/s',
+            'avatar'                => 'avatar/s',
         ];
 
         $save_param = array_filter($this->buildParam($param));
@@ -870,7 +871,18 @@ class User extends Api
         $result = $News->getMyMessage($user['id'],$type);
 
         $this->success('请求成功',$result);
+    }
 
+    public function myQrCode()
+    {
+        $user = $this->auth->getUser();
+
+        $list = $user::getUserList($user->id);
+        $info = $list[0];
+        $url = Config::get('url');
+
+        $info['qrCode'] = $url . '/qrCode/' .$user->id . '.jpg';
+        $this->success('请求成功!',$info);
     }
 
 }
