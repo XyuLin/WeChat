@@ -89,12 +89,17 @@ class Follow extends Model
         $categoryModel = new BlockCategory();
         $block = $blockModel->select();
         $block = collection($block)->toArray();
-        $category = $categoryModel->where('id','not in', $ids)->select();
+        $category = $categoryModel->select();
         $category = collection($category)->toArray();
         // halt($block);
         foreach($block as &$value) {
             foreach($category as $item) {
                 if($item['block_id'] == $value['id']){
+                    if(in_array($item['id'],$ids)) {
+                        $item['isFollow'] = 'true';
+                    } else {
+                        $item['isFollow'] = 'false';
+                    }
                     $value['list'][]  = $item;
                 }
             }
