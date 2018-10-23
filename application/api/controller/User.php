@@ -513,7 +513,7 @@ class User extends Api
             $exist = Comment::get($save_data['parent_id']);
             if(!$exist) $this->error('参数错误 - parent_id');
         }
-        $info = Article::get($param['article_id']);
+        $info = Article::get($save_data['article_id']);
         if($info == null) {
             $this->error('参数错误 - id');
         }
