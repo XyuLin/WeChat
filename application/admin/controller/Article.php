@@ -174,6 +174,7 @@ class Article extends Backend
         }
         return $this->view->fetch();
     }
+
     
 
 }

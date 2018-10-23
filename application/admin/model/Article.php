@@ -51,6 +51,10 @@ class Article extends Model
         }
     }
 
+    public function getTitleAttr($value,$data)
+    {
+        return $this->changeStr($value,'15');
+    }
 
 
 

@@ -41,7 +41,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'images', title: __('Images'),operate:false, formatter: Table.api.formatter.images},
                         {field: 'shares', title: __('Shares'),operate:false},
                         {field: 'likes', title: __('Likes'),operate:false},
-                        {field: 'comments', title: __('Comments'),operate:false},
+                        {field: 'comments', title: __('Comments'),operate:false,formatter: Controller.api.commentInfo},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
@@ -98,7 +98,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'images', title: __('Images'),operate:false, formatter: Table.api.formatter.images},
                         {field: 'shares', title: __('Shares'),operate:false},
                         {field: 'likes', title: __('Likes'),operate:false},
-                        {field: 'comments', title: __('Comments'),operate:false},
+                        {field: 'comments', title: __('Comments'),operate:false,formatter: Controller.api.commentInfo},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
@@ -117,6 +117,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
         api: {
             bindevent: function () {
                 Form.api.bindevent($("form[role=form]"));
+            },
+            commentInfo: function (value, row, index)
+            {
+                let id = row.id;
+                let url = "comments/index?article_id="+ id;
+                return '<a href="' + url + '" class="label label-success addtabsit" title="' + "查看评论" + '">' + "评论数"+ row.comments + '</a>';
+                // return Table.api.formatter.addtabs(value, row, index, url);
             }
         }
     };

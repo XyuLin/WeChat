@@ -115,4 +115,20 @@ class Num extends Model
         }
         return $days;
     }
+
+
+    public static function longTask($user,$time)
+    {
+        $year = date('Y',$time);
+        $month = date('m',$time);
+        $day = date('d',$time);
+        $ids = self::where('user_id',$user)->where('year',$year)->where('month',$month)->where('day',$day)->column('task_id');
+        if($ids != null) {
+            $leng = Task::where('id','in',$ids)->column('lenght');
+        } else {
+            $leng = 0;
+        }
+        return timePlus($leng);
+    }
+
 }

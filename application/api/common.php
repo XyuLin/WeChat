@@ -46,3 +46,22 @@ function pickIds($array)
 
     return $ids;
 }
+
+function timePlus($array)
+{
+    $minute = 0;
+    $second = 0;
+    foreach ($array as $key => $value) {
+            $time = explode(':',$value);
+            $minute += $time[0];
+            $second += $time[1];
+    }
+
+    $remainder = $second % 60;
+    if($remainder < 10) {
+        $remainder = '0'.$remainder;
+    }
+    $minute += (int)($second / 60);
+    return $minute.":".$remainder;
+
+}
