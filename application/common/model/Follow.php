@@ -65,6 +65,7 @@ class Follow extends Model
                 } else {
                     $action = '2';
                 }
+
                 $categoryModel = new BlockCategory;
                 $data = $categoryModel->getBlockCategoryList($ids,$default,$action);
             }

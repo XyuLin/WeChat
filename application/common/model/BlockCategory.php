@@ -42,10 +42,10 @@ class BlockCategory extends Model
                     if($default != '') {
                         $data = $this->default_in_array($data,$default);
                     }
-                    $array['default'] = $data[0];
-                    unset($data[0]);
-                    $array['list'] = array_merge([],$data);
-                    $data = $array;
+//                    $array['default'] = $data[0];
+//                    unset($data[0]);
+//                    $array['list'] = array_merge([],$data);
+                    $data = $data;
                 } else {
                     $data = $data;
                 }
@@ -60,6 +60,7 @@ class BlockCategory extends Model
     {
         $key = '';
         $val = [];
+
         foreach($array as $key => $value) {
             if($value['id'] == $default) {
                 $val = $value;

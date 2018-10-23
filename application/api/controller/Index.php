@@ -56,12 +56,13 @@ class Index extends Api
         // 获取关注的版块分类id
         $category_id = $this->request->post('category_id');
         $data['myFollows'] = Follow::getUserFollows($user['id'],'2',$category_id);
+
         if(!is_array($data['myFollows'])){
             $this->error($data['myFollows'],'','40001');
         }
         // 获取page参数
         $page = $this->request->post('page/s');
-        $data['hotArticle'] = model('Article')->getHotArticle(empty($data['myFollows'])?'': $data['myFollows']['default']['id'],$page);
+        $data['hotArticle'] = model('Article')->getHotArticle(empty($data['myFollows'])?'': $data['myFollows']['0']['id'],$page);
         $this->success('请求数据成功',$data,'1');
     }
 
