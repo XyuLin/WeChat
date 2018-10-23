@@ -6,6 +6,7 @@ use app\admin\model\Banner;
 use app\common\controller\Api;
 use app\common\model\Article;
 use app\common\model\Follow;
+use JPush\Client;
 use think\Db;
 use think\Exception;
 
@@ -15,7 +16,7 @@ use think\Exception;
 class Index extends Api
 {
 
-    protected $noNeedLogin = ['index','findUser'];
+    protected $noNeedLogin = ['index','findUser','test'];
     protected $noNeedRight = ['*'];
 
     /**
@@ -129,5 +130,24 @@ class Index extends Api
         $data['list'] = $list;
         $data['total'] = $total;
         $this->success('请求成功',$data);
+    }
+
+    public function test()
+    {
+        $client = new Client('137258992','Assoofnoenandfnesdfdsf');
+        $push = $client->push();
+        $push->setCid('123123123')
+            ->setPlatform('all')
+            ->addAllAudience('all')
+            ->setNotificationAlert('alert')
+            ->iosNotification('hello')
+            ->addWinPhoneNotification('hello')
+            ->send();
+        halt($push);
+    }
+
+    public function videoList()
+    {
+
     }
 }

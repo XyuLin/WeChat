@@ -73,19 +73,20 @@ class Article extends Model
     /**
      * @param string $category_id
      * @param string $page
+     * @param string $type  1 = 文章  ， 2 = 视频
      *
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getHotArticle($category_id = '',$page = '1')
+    public function getHotArticle($category_id = '',$page = '1', $type = '1' )
     {
         if($category_id != '') {
-            $array = $this->where('block_category_id',$category_id)->limit('10')->page($page)->order('id desc')->select();
-            $total = $this->where('block_category_id',$category_id)->count();
+            $array = $this->where('block_category_id',$category_id)->where('type',$type)->limit('10')->page($page)->order('id desc')->select();
+            $total = $this->where('block_category_id',$category_id)->where('type',$type)->count();
         } else {
-            $array = $this->limit('10')->page($page)->order('id desc')->select();
+            $array = $this->where('type',$type)->limit('10')->page($page)->order('id desc')->select();
             $total = $this->count();
         }
 
@@ -128,14 +129,15 @@ class Article extends Model
      * @param $category_id
      * @param $user_id
      * @param $page
+     * @param $type  1 = 文章 ，2 = 视频
      *
      * @return array|false|\PDOStatement|string|\think\Collection
      */
-    public function recommendUser($category_id,$user_id,$page)
+    public function recommendUser($category_id,$user_id,$page,$type = '1')
     {
         $str = '找出在本版块发布过文章的用户，排序(规则) 
             用文章的热度来排序，重复会员去重。' ;
-        $ids = $this->where('block_category_id',$category_id)->order('comments desc,shares desc,likes desc')->limit('4')->page($page)->column('user_id');
+        $ids = $this->where('block_category_id',$category_id)->where('type',$type)->order('comments desc,shares desc,likes desc')->limit('4')->page($page)->column('user_id');
         // 推荐用户id
         $ids = array_unique($ids);
 
@@ -225,6 +227,7 @@ class Article extends Model
         }
     }
 
+    // 我发表的文章
     public function getPublish($user_id,$page = '1')
     {
         $list = $this->where('user_id',$user_id)
