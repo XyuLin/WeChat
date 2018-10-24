@@ -40,6 +40,7 @@ class Index extends Api
         } else {
             $data['min'] = $heart->where('user_id',$user->id)->where('createtime','between',"$beginToday,$endToday")->min('heart_rate');
             $data['avg'] = $heart->where('user_id',$user->id)->where('createtime','between',"$beginToday,$endToday")->avg('heart_rate');
+            $data['avg'] = (int)$data['avg'];
         }
 
         $data['longTask'] = Num::longTask($user->id,time());
