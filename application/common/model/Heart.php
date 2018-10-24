@@ -17,5 +17,16 @@ class Heart extends Model
 
     protected $autoWriteTimestamp = 'int';
     protected $createTime = 'createtime';
+    protected $updateTime = false;
     protected $append = [];
+
+    public function afferentHeart($param)
+    {
+        $result = $this->allowField(true)->create($param);
+        if($result) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

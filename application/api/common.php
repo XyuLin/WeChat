@@ -63,5 +63,14 @@ function timePlus($array)
     }
     $minute += (int)($second / 60);
     return $minute.":".$remainder;
+}
 
+function todayTime($time)
+{
+    $beginToday = mktime(0,0,0,date('m',$time),date('d',$time),date('Y',$time));
+    $endToday = mktime(0,0,0,date('m',$time),date('d',$time)+1,date('Y',$time))-1;
+    return [
+        'beginTime' => $beginToday,
+        'endTime'   => $endToday,
+    ];
 }

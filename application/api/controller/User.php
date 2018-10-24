@@ -11,8 +11,10 @@ use app\common\model\Care;
 use app\common\model\Collection;
 use app\common\model\Comment;
 use app\common\model\Follow;
+use app\common\model\Heart;
 use app\common\model\Like;
 use app\common\model\News;
+use app\common\model\Step;
 use fast\Random;
 use think\Config;
 use think\Db;
@@ -887,6 +889,34 @@ class User extends Api
 
         $info['qrCode'] = $url . '/qrCode/' .$user->id . '.jpg';
         $this->success('请求成功!',$info);
+    }
+
+    public function afferentHeart()
+    {
+        $model = new Heart();
+        $user = $this->auth->getUser();
+        $param['heart_rate'] = $this->request->param('heart_rate');
+        $param['user_id'] = $user->id;
+        $result = $model->afferentHeart($param);
+
+        if($result == false) {
+            $this->error('记录心率失败!');
+        }
+        $this->success('记录心率成功!');
+    }
+
+    public function afferentStep()
+    {
+        $user =  $this->auth->getUser();
+        $param['step'] = $this->request->param('step_num/s');
+        $param['user_id'] = $user->id;
+
+        $model = new Step();
+        $result = $model->afferentStep($param);
+        if($result == false) {
+            $this->error('记录步数失败!');
+        }
+        $this->success('记录成功');
     }
 
 }

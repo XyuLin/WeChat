@@ -125,10 +125,11 @@ class Num extends Model
         $ids = self::where('user_id',$user)->where('year',$year)->where('month',$month)->where('day',$day)->column('task_id');
         if($ids != null) {
             $leng = Task::where('id','in',$ids)->column('lenght');
+            $leng = timePlus($leng);
         } else {
-            $leng = 0;
+            $leng = "0:00";
         }
-        return timePlus($leng);
+        return $leng;
     }
 
 }

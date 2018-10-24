@@ -87,7 +87,7 @@ class Article extends Model
             $total = $this->where('block_category_id',$category_id)->where('type',$type)->count();
         } else {
             $array = $this->where('type',$type)->limit('10')->page($page)->order('id desc')->select();
-            $total = $this->count();
+            $total = $this->where('type',$type)->count();
         }
 
         $data['list'] = $this->splicingUrl($array);

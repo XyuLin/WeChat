@@ -8,6 +8,7 @@ use app\common\model\Article;
 use app\common\model\Follow;
 use app\common\model\Heart;
 use app\common\model\motion\Num;
+use app\common\model\Step;
 use JPush\Client;
 use think\Db;
 use think\Exception;
@@ -28,8 +29,9 @@ class Index extends Api
     public function index()
     {
         $heart = new Heart();
-        $beginToday = mktime(0,0,0,date('m'),date('d'),date('Y'));
-        $endToday = mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
+        $todayTime = todayTime(time());
+        $beginToday = $todayTime['beginTime'];
+        $endToday = $todayTime['endTime'];
         $user = $this->auth->getUser();
         $data['max'] = $heart->where('user_id',$user->id)->where('createtime','between',"$beginToday,$endToday")->max('heart_rate');
         if($data['max'] == '0') {
@@ -40,7 +42,8 @@ class Index extends Api
             $data['avg'] = $heart->where('user_id',$user->id)->where('createtime','between',"$beginToday,$endToday")->avg('heart_rate');
         }
 
-        $data['longTask'] = Num::longTask($user->id,'1539679707');
+        $data['longTask'] = Num::longTask($user->id,time());
+        $data['stepNumber'] = Step::getTodayStepNumber($user->id,time());
 
         $this->success('请求成功',$data);
     }
@@ -165,6 +168,9 @@ class Index extends Api
 
     public function videoList()
     {
-
+        $model = new Article();
+        $page = $this->request->param('page/s');
+        $list = $model->getHotArticle('',$page,'2');
+        $this->success('请求成功',$list);
     }
 }

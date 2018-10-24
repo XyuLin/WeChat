@@ -9,7 +9,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 extend: {
                     index_url: 'comments/index',
                     add_url: 'comments/add',
-                    edit_url: 'comments/edit',
+                    edit_url: '',
                     del_url: 'comments/del',
                     multi_url: 'comments/multi',
                     table: 'comments',
