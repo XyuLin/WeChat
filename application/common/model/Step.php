@@ -30,7 +30,7 @@ class Step extends Model
             $info= $this->allowField(true)->create($param);
             $result = $info->id;
         } else {
-            $info->step = ['inc',$param['step']];
+            $info->step = $param['step'];
             $result = $info->save();
         }
 

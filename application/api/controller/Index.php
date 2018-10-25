@@ -167,6 +167,7 @@ class Index extends Api
         halt($push);
     }
 
+    // 视频列表
     public function videoList()
     {
         $model = new Article();
@@ -174,4 +175,6 @@ class Index extends Api
         $list = $model->getHotArticle('',$page,'2');
         $this->success('请求成功',$list);
     }
+
+
 }

@@ -13,7 +13,7 @@ use think\Model;
 
 class Map extends Model
 {
-    protected $name = '';
+    protected $name = 'map';
     protected $autoWriteTimestamp = 'int';
     protected $createTime = 'createtime';
     protected $updateTime = 'updatetime';
@@ -46,19 +46,66 @@ class Map extends Model
         $maxLng = $lng + $lngR;//最大经度
         $minLng = $lng - $lngR;//最小经度
 
-        $ids = $this->where('lat','between',"$maxLat,$minLat")
+        $array =collection( $this->field('user_id,lat,lng')->where('lat','between',"$maxLat,$minLat")
             ->where('lng','between',"$maxLng,$minLng")
-            ->column('user_id');
+            ->select())->toArray();
+        if(length($array) > 10) {
+            $distance = [];
+            foreach($array as $key => $value) {
+                $result = $this->getDistance($lat,$lng,$value['lat'],$value['lng']);
+                $distance[$value['user_id']] = $result;
+            }
+
+            $distance = asort($distance);
+            $satisfy = array_slice($distance,0,10);
+            $ids = pickIds($satisfy);
+        } else {
+            $ids = pickIds($array,'user_id');
+        }
+
         return $ids;
     }
 
-    // 发送接单请求
-    public function pushAid($ids)
+    // 发送援助请求
+    public function pushAid($user,$ids)
+    {
+        $array = [];
+        foreach ($ids as $value) {
+            $array[] = [
+                'user_id' => $user,
+                'invited_id' => $value,
+                'status' => 0, 
+            ];
+        }
+
+        $model = new CryHelp();
+        $model->allowField(true)->saveAll($array);
+
+    }
+
+    // 受邀人 标出本人位置与发出求救信号的用户位置
+    public function invitedUser()
     {
 
     }
 
-    // 接单 导航。计算两者之间的距离
 
-    //
+
+    /*
+ * 1.纬度1，经度1，纬度2，经度2
+ * 2.返回结果是单位是KM。
+ * 3.保留一位小数
+ */
+    function getDistance($lat1,$lng1,$lat2,$lng2)
+    {
+        //将角度转为狐度
+        $radLat1 = deg2rad($lat1);//deg2rad()函数将角度转换为弧度
+        $radLat2 = deg2rad($lat2);
+        $radLng1 = deg2rad($lng1);
+        $radLng2 = deg2rad($lng2);
+        $a = $radLat1 - $radLat2;
+        $b = $radLng1 - $radLng2;
+        $s = 2*asin(sqrt(pow(sin($a/2),2)+cos($radLat1)*cos($radLat2)*pow(sin($b/2),2)))*6371;
+        return round($s,1);
+    }
 }
