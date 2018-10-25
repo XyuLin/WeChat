@@ -34,7 +34,7 @@ class Step extends Model
             $result = $info->save();
         }
 
-        if($result > 0) {
+        if($result !== false) {
             return true;
         } else {
             return false;
