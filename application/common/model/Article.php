@@ -133,7 +133,7 @@ class Article extends Model
      *
      * @return array|false|\PDOStatement|string|\think\Collection
      */
-    public function recommendUser($category_id,$user_id,$page,$type = '1')
+    public function recommendUser($category_id,$user_id,$page = '1',$type = '1')
     {
         $str = '找出在本版块发布过文章的用户，排序(规则) 
             用文章的热度来排序，重复会员去重。' ;

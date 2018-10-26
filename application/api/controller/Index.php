@@ -107,8 +107,9 @@ class Index extends Api
         // 获取版块id  页码
         $id = $this->request->post('category_id/s');
         $page = $this->request->post('page/s');
+        $p = $this->request->post('p/s');
         // 推荐用户
-        $data['recommend'] = $model->recommendUser($id,$user['id'],$page);
+        $data['recommend'] = $model->recommendUser($id,$user['id'],$p);
         // 文章
         $data['list'] = $model->getHotArticle($id,$page);
 
