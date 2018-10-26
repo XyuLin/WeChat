@@ -109,7 +109,10 @@ class Article extends Backend
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
             $params['type'] = '1';
-            $params['user_id'] = '1';
+            if($params['user_id'] == '') {
+                $params['user_id'] = '1';
+            }
+
             if ($params) {
                 if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                     $params[$this->dataLimitField] = $this->auth->id;
