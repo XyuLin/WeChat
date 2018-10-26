@@ -27,7 +27,13 @@ class Map extends Model
             'lat'       => $lat,
             'lng'       => $lng,
         ];
-        $result = $this->create($param);
+        $info = $this->where('user_id',$param['user_id'])->find();
+        if($info == null) {
+            $result = $this->create($param);
+        } else {
+            $result = $info->save($param);
+        }
+
         return $result;
     }
 
@@ -80,12 +86,15 @@ class Map extends Model
 
         $model = new CryHelp();
         $model->allowField(true)->saveAll($array);
+        // 推送
 
     }
 
     // 受邀人 标出本人位置与发出求救信号的用户位置
-    public function invitedUser()
+    public function invitedUser($user)
     {
+        $model = new CryHelp();
+        //
 
     }
 
