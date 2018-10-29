@@ -31,6 +31,10 @@ class Rescue extends Model
             ];
         }
 
-        $this->allowField(true)->saveAll($array);
+        $result = $this->allowField(true)->saveAll($array);
+        if($result == false) {
+            return false;
+        }
+        return true;
     }
 }

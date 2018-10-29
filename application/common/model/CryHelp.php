@@ -37,17 +37,9 @@ class CryHelp extends Model
             // 如果有两名施救者，则不再继续发送信号给附近的人。
             $info = $this->where('id',$cry_id)->find();
             if($info->status == 2) {
-                return ;
+                return false;
             }
         }
-        // 检索附近的用户
-        $map = new Map();
-        $ids = $map->retrieval($user);
-        // 如果当前附近没有用户，则直接返回空
-        if(empty($ids)) {
-            return [];
-        }
-        $rescue = new Rescue();
-        $result = $rescue->pushAid($user,$ids);
+        return $cry_id;
     }
 }

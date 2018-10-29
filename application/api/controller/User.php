@@ -891,6 +891,7 @@ class User extends Api
         $this->success('请求成功!',$info);
     }
 
+    // 传入用户今日心率
     public function afferentHeart()
     {
         $model = new Heart();
@@ -905,6 +906,7 @@ class User extends Api
         $this->success('记录心率成功!');
     }
 
+    // 传入用户今日总步数
     public function afferentStep()
     {
         $user =  $this->auth->getUser();
@@ -917,6 +919,73 @@ class User extends Api
             $this->error('记录步数失败!');
         }
         $this->success('记录成功');
+    }
+
+    //  传入用户经纬度
+    public function afferentLatLng()
+    {
+        $map = new \app\common\model\Map();
+        $user = $this->auth->getUser();
+        $param = [
+            'lat' => 'lat/s',
+            'lng' => 'lng/s',
+        ];
+        $param = $this->buildParam($param);
+        $result = $map->depositInLatLng($user->id,$param['lat'],$param['lng']);
+        if($result !== false) {
+            $this->success('更新位置成功!');
+        } else {
+            $this->error('更新位置失败!');
+        }
+    }
+
+    // 呼救
+    public function callHelp()
+    {
+        $user = $this->auth->getUser();
+        $cry_id = $this->request->param('cry_id');
+        // 呼救
+        $cryHelp = new \app\common\model\CryHelp();
+        $rescue = new \app\common\model\Rescue();
+        $cryHelp->startTrans();
+        $rescue->startTrans();
+        try{
+            $cry_id = $cryHelp->callForHelp($user->id,$cry_id);
+            if($cry_id !== false) {
+                // 检索附近的用户
+                $map = new \app\common\model\Map();
+                $ids = $map->retrieval($user->id);
+                if($ids === false) {
+                    throw new Exception('没有获取当前用户的位置','0');
+                }
+                // 如果当前附近没有用户，则直接返回空
+                if(empty($ids)) {
+                    throw new Exception('附近未检测到用户','1');
+                }
+                $result = $rescue->pushAid($cry_id,$ids);
+                // 如果添加求救信号出错 则回滚数据
+                if($result == false) {
+                    throw new Exception('添加求救信号失败','0');
+                }
+                // 推送用户
+
+                // 提交事务
+                $cryHelp->commit();
+                $rescue->commit();
+            } else {
+                throw new Exception('施救者已上限','1');
+            }
+        } catch (\Exception $e) {
+            $rescue->rollback();
+            $cryHelp->rollback();
+            if($e->getCode() == '1') {
+                $this->success($e->getMessage());
+            } else {
+                $this->error($e->getMessage());
+            }
+        }
+
+
     }
 
 }

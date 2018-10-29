@@ -41,6 +41,9 @@ class Map extends Model
     public function retrieval($user,$unit = 1)
     {
         $core = $this->where('user_id',$user)->find();
+        if($core == null) {
+            return false;
+        }
         $lat = $core->lat;
         $lng = $core->lng;
         // 计算最大最小经纬度
