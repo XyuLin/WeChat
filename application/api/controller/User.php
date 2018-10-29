@@ -944,6 +944,8 @@ class User extends Api
     {
         $user = $this->auth->getUser();
         $cry_id = $this->request->param('cry_id');
+        $lat = $this->request->param('lat');
+        $lng = $this->request->param('lng');
         // 呼救
         $cryHelp = new \app\common\model\CryHelp();
         $rescue = new \app\common\model\Rescue();
@@ -954,7 +956,7 @@ class User extends Api
             if($cry_id !== false) {
                 // 检索附近的用户
                 $map = new \app\common\model\Map();
-                $ids = $map->retrieval($user->id);
+                $ids = $map->retrieval($user->id,$lat,$lng);
                 if($ids === false) {
                     throw new Exception('没有获取当前用户的位置','0');
                 }
@@ -973,7 +975,7 @@ class User extends Api
                 $cryHelp->commit();
                 $rescue->commit();
             } else {
-                throw new Exception('施救者已上限','1');
+                throw new Exception('施救者已上限','0');
             }
         } catch (\Exception $e) {
             $rescue->rollback();
@@ -985,7 +987,56 @@ class User extends Api
             }
         }
 
+        $this->success('求救信号已发出!',['cry_id'=>$cry_id]);
+    }
+
+    // 呼救状态
+    public function callStatus()
+    {
+        $user = $this->auth->getUser();
+        $cry_id = $this->request->param('cry_id');
+        $rescue = new \app\common\model\Rescue();
+        $result = $rescue->getStatus($user,$cry_id);
+    }
+
+    // 接单
+    public function receipt()
+    {
+        $user = $this->auth->getUser();
+        $cry_id = $this->request->param('cry_id');
+        $model = new \app\common\model\Rescue();
+        $info = $model->receipt($user->id,$cry_id);
+
+        if($info->getCustomError() != '') {
+            $this->error($info->getCustomError());
+        } else {
+            $this->success('接单成功!');
+        }
+
 
     }
+
+    // 拒绝
+    public function refuse()
+    {
+        $user = $this->auth->getUser();
+        $cry_id = $this->request->param('cry_id');
+        $model = new \app\common\model\Rescue();
+        $info = $model->where('invited_id',$user->id)->where('cry_id',$cry_id)->find();
+        if($info == null) {
+            $this->error('参数错误 - cry_id');
+        }
+        if($info->status == '1') {
+            $info->status = '4';
+            $info->save();
+            $this->success('拒绝成功!');
+        } else {
+            $this->error('您已接单暂时不可以拒绝!');
+        }
+
+
+
+    }
+
 
 }

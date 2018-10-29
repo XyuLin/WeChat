@@ -32,16 +32,25 @@ class Map extends Model
             $result = $this->create($param);
         } else {
             $result = $info->save($param);
+            if($result !== false){
+                $result = $info;
+            } else {
+                $result = false;
+            }
         }
 
         return $result;
     }
 
     // 检索 搜寻附近 1km(变量) 的用户。
-    public function retrieval($user,$unit = 1)
+    public function retrieval($user,$lat = '',$lng = '',$unit = 1)
     {
-        $core = $this->where('user_id',$user)->find();
-        if($core == null) {
+        if(!empty($lat) && !empty($lng)) {
+            $core = $this->depositInLatLng($user,$lat,$lng);
+        } else {
+            $core = $this->where('user_id',$user)->find();
+        }
+        if($core == null || $core == false) {
             return false;
         }
         $lat = $core->lat;
@@ -55,17 +64,23 @@ class Map extends Model
         $maxLng = $lng + $lngR;//最大经度
         $minLng = $lng - $lngR;//最小经度
 
-        $array =collection( $this->field('user_id,lat,lng')->where('lat','between',"$maxLat,$minLat")
-            ->where('lng','between',"$maxLng,$minLng")
-            ->select())->toArray();
+//        dump($maxLat);
+//        dump($minLat);
+//        dump($maxLng);
+//        dump($minLng);
 
+
+        $array =collection( $this->field('user_id,lat,lng')->where('lat','between',"$minLat,$maxLat")
+            ->where('lng','between',"$minLng,$maxLng")
+            ->where('user_id','neq',$user)
+            ->select())->toArray();
         // 如果附近没有用户，返回空数组
         if(empty($array)) {
             return [];
         }
 
         // 如果附近人数大于10 则排序最近的10名用户
-        if(length($array) > 10) {
+        if(count($array) > 10) {
             $distance = [];
             foreach($array as $key => $value) {
                 // 将每一个用户与呼救者的距离列出
@@ -100,7 +115,7 @@ class Map extends Model
  * 2.返回结果是单位是KM。
  * 3.保留一位小数
  */
-    function getDistance($lat1,$lng1,$lat2,$lng2)
+    public function getDistance($lat1,$lng1,$lat2,$lng2)
     {
         //将角度转为狐度
         $radLat1 = deg2rad($lat1);//deg2rad()函数将角度转换为弧度

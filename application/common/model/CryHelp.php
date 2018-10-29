@@ -19,7 +19,7 @@ class CryHelp extends Model
     protected $updateTime = 'updatetime';
     protected $append = [];
 
-    private $status = '状态:0=信号,1=未完成,2=施救者数量上限,3=已完成,4=已取消';
+    private $statusArr = '状态:0=信号,1=未完成,2=施救者数量上限,3=已完成,4=已取消';
 
     // 呼救 给附近的人发出信号
     public function callForHelp($user,$cry_id = '')
@@ -28,11 +28,17 @@ class CryHelp extends Model
         if($cry_id == '') {
             $param = [
                 'user_id' => $user,
-                'status'  => '1',
+                'status'  => '0',
             ];
-            // 发出求救信号
-            $info = $this->create($param);
-            $cry_id = $info->id;
+            // 判断用户是否存在没有完成的呼救
+            $info = $this->where('user_id',$user)->where('status','in','0,1,2')->find();
+            if($info == null) {
+                // 发出求救信号
+                $info = $this->create($param);
+                $cry_id = $info->id;
+            } else {
+                $cry_id = $info->id;
+            }
         } else {
             // 如果有两名施救者，则不再继续发送信号给附近的人。
             $info = $this->where('id',$cry_id)->find();
