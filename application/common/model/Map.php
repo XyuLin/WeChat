@@ -55,39 +55,31 @@ class Map extends Model
         $array =collection( $this->field('user_id,lat,lng')->where('lat','between',"$maxLat,$minLat")
             ->where('lng','between',"$maxLng,$minLng")
             ->select())->toArray();
+
+        // 如果附近没有用户，返回空数组
+        if(empty($array)) {
+            return [];
+        }
+
+        // 如果附近人数大于10 则排序最近的10名用户
         if(length($array) > 10) {
             $distance = [];
             foreach($array as $key => $value) {
+                // 将每一个用户与呼救者的距离列出
                 $result = $this->getDistance($lat,$lng,$value['lat'],$value['lng']);
                 $distance[$value['user_id']] = $result;
             }
 
+            // 进行升序排序 距离近的取出用户id
             $distance = asort($distance);
             $satisfy = array_slice($distance,0,10);
             $ids = pickIds($satisfy);
         } else {
+            // 人数小于等于10 直接返回10名用户的id
             $ids = pickIds($array,'user_id');
         }
 
         return $ids;
-    }
-
-    // 发送援助请求
-    public function pushAid($user,$ids)
-    {
-        $array = [];
-        foreach ($ids as $value) {
-            $array[] = [
-                'user_id' => $user,
-                'invited_id' => $value,
-                'status' => 0, 
-            ];
-        }
-
-        $model = new CryHelp();
-        $model->allowField(true)->saveAll($array);
-        // 推送
-
     }
 
     // 受邀人 标出本人位置与发出求救信号的用户位置

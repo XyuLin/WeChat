@@ -13,4 +13,6 @@ class Config {
     const HTTP_POST = 'POST';
     const HTTP_DELETE = 'DELETE';
     const HTTP_PUT = 'PUT';
+    const APP_KEY = 'b176d5778f8a2afa99eb5378';
+    const SECRET = '43d9217a7a195dba94b3c7c2';
 }

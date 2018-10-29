@@ -138,6 +138,7 @@ class Article extends Backend
             }
             $this->error(__('Parameter %s can not be empty', ''));
         }
+        $this->view->assign("type", '1');
         return $this->view->fetch();
     }
 
@@ -175,6 +176,7 @@ class Article extends Backend
             }
             $this->error(__('Parameter %s can not be empty', ''));
         }
+        $this->view->assign("type", '2');
         return $this->view->fetch();
     }
 
