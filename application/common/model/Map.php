@@ -100,15 +100,6 @@ class Map extends Model
         return $ids;
     }
 
-    // 受邀人 标出本人位置与发出求救信号的用户位置
-    public function invitedUser($user)
-    {
-        $model = new CryHelp();
-        //
-
-    }
-
-
 
     /*
  * 1.纬度1，经度1，纬度2，经度2
@@ -126,5 +117,11 @@ class Map extends Model
         $b = $radLng1 - $radLng2;
         $s = 2*asin(sqrt(pow(sin($a/2),2)+cos($radLat1)*cos($radLat2)*pow(sin($b/2),2)))*6371;
         return round($s,1);
+    }
+
+    public static function getUserPosition($ids)
+    {
+        $list = collection(self::field('user_id,lat,lng')->where('user_id','in',$ids)->select())->toArray();
+        return $list;
     }
 }

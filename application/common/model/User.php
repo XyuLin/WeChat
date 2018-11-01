@@ -115,9 +115,13 @@ class User Extends Model
         return $level;
     }
 
-    public static function getUserList($ids)
+    public static function getUserList($ids,$isPhone = false)
     {
-        $list = self::field('id,nickname,avatar,gender')->where('id','in',$ids)->select();
+        $field = 'id,nickname,avatar,gender,mobile';
+        if($isPhone == false) {
+            $field = 'id,nickname,avatar,gender';
+        }
+        $list = self::field($field)->where('id','in',$ids)->select();
         $list = collection($list)->toArray();
 
         $url = \think\Config::get('url');

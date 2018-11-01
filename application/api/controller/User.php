@@ -19,7 +19,6 @@ use fast\Random;
 use think\Config;
 use think\Db;
 use think\Exception;
-use think\Hook;
 use think\Validate;
 
 /**
@@ -962,7 +961,7 @@ class User extends Api
                 }
                 // 如果当前附近没有用户，则直接返回空
                 if(empty($ids)) {
-                    throw new Exception('附近未检测到用户','1');
+                    throw new Exception('附近未检测到用户','0');
                 }
                 $result = $rescue->pushAid($cry_id,$ids);
                 // 如果添加求救信号出错 则回滚数据
@@ -986,8 +985,11 @@ class User extends Api
                 $this->error($e->getMessage());
             }
         }
-
-        $this->success('求救信号已发出!',['cry_id'=>$cry_id]);
+        $msg = [
+            'cry_id' => $cry_id,
+            'isReceipt' => $rescue->getIsReceipt($cry_id),
+        ];
+        $this->success('求救信号已发出!',$msg);
     }
 
     // 呼救状态
@@ -1033,10 +1035,41 @@ class User extends Api
         } else {
             $this->error('您已接单暂时不可以拒绝!');
         }
-
-
-
     }
 
+    // 呼救完成或取消
+    public function helpComplete()
+    {
+        $user = $this->auth->getUser();
+        $cry_id = $this->request->param('cry_id');
+        $model = new \app\common\model\CryHelp();
+
+        $result = $model->complete($user->id,$cry_id);
+
+        if($result->getCustomError()) {
+            $this->error($result->getCustomError());
+        }
+
+        if($result->status == '4') {
+            $msg = '求救取消!';
+        } elseif ($result->status == '3') {
+            $msg = '求救完成!';
+        } else {
+            $msg = '发生错误!';
+        }
+
+        $this->success($msg);
+    }
+
+    public function getHelpInfo()
+    {
+        $user = $this->auth->getUser();
+        $model = new \app\common\model\CryHelp();
+        $cry_id = $this->request->param('cry_id');
+
+        $result = $model->getDetail($cry_id,$user);
+
+        $this->success('请求成功!',$result);
+    }
 
 }

@@ -18,7 +18,7 @@ class Rescue extends Model
     protected $createTime = 'createtime';
     protected $updateTime = 'updatetime';
     protected $append = [];
-    private $statusArr = '状态:1=未选择,2=接受,3=接单人数已满,4=拒绝,5=完成';
+    private $statusArr = '状态:1=未选择,2=接受,3=接单人数已满,4=拒绝,5=完成,6=被取消';
     // 发送援助请求
     public function pushAid($cry_id,$ids)
     {
@@ -84,15 +84,16 @@ class Rescue extends Model
             // 修改状态
             $info->status = '2';
             $info->save();
+
+            if($cryInfo->status == '0') {
+                $cryInfo->status = '1';
+            }
             // 统计是否已满2名用户接单
             $count = $this->where('cry_id',$cry_id)->count('id');
             if($count == '2') {
                 $cryInfo->status = '2';
             }
 
-            if($cryInfo->status == '0') {
-                $cryInfo->status = '1';
-            }
             $cryInfo->save();
             return $info;
 
@@ -104,6 +105,17 @@ class Rescue extends Model
             $this->setCustomError('该任务已取消!');
         }
         return $this;
+    }
 
+    // 判断是否有人接单
+    public function getIsReceipt($cry_id)
+    {
+        $info = $this->where('cry_id',$cry_id)->where('status','2')->select();
+
+        if($info == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

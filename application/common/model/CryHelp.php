@@ -48,4 +48,81 @@ class CryHelp extends Model
         }
         return $cry_id;
     }
+
+    // 取消或者完成求救
+    public function complete($user,$cry_id)
+    {
+        $info = $this->where('user_id',$user)->where('id',$cry_id)->find();
+        // 如果查询结果为NULL 表示 参数错误
+        if($info == null) {
+            $this->setCustomError('参数错误 - cry_id');
+            return $this;
+        }
+
+        $rescue = new Rescue();
+        $list = $rescue->where('cry_id',$cry_id)->where('status','2')->column('id');
+
+        if(empty($list)) {
+            // 如果没有接单的用户，则表示取消
+            $info->status = '4';
+            $rescue->where('id','in',$list)->update([
+                'status' => '6',  // 被取消
+            ]);
+        } else {
+            // 完成
+            $info->status = '3';
+            $rescue->where('id','in',$list)->update([
+                'status' => '5', // 完成
+            ]);
+        }
+
+        $info->save();
+        return $info;
+    }
+
+    // 求救详情
+    public function getDetail($cry_id,$user)
+    {
+        // 判断用户是求救者还是施救者
+        $array = [];
+        $info = $this->where('id',$cry_id)->find();
+        $model = new Rescue();
+        $rescue = collection($model->where('cry_id',$cry_id)->where('status','2')->select())->toArray();
+        $help_ids['0'] = $info['user_id'];
+
+        if(empty($rescue)) {
+                $invited_ids = [];
+        } else {
+            foreach ($rescue as $value) {
+                $invited_ids[] = $value['invited_id'];
+            }
+        }
+
+
+        $ids = array_merge($help_ids,$invited_ids);
+        $userList = User::getUserList($ids,true);
+        $userPosition = Map::getUserPosition($ids);
+
+        foreach($userList as $key => $val) {
+            foreach($userPosition as $v) {
+                if($val['id'] == $v['user_id']) {
+                    $array[$key] = $val;
+                    $array[$key]['lat'] = $v['lat'];
+                    $array[$key]['lng'] = $v['lng'];
+                }
+            }
+        }
+        $data = [
+            'cry'    => [],
+            'rescue' => [],
+        ];
+        foreach ($array as $value) {
+            if($help_ids[0] == $value['id']) {
+                $data['cry'] = $value;
+            } else {
+                $data['rescue'][] = $value;
+            }
+        }
+        return $data;
+    }
 }
