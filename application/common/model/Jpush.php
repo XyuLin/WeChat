@@ -44,39 +44,49 @@ class Jpush extends Model
     }
 
     // 推送
-    public function push($userArray,$title,$content,$optin = [])
+    public function push($userArray,$title = '救救我,我快不行了',$alert = '救救我',$extras = [])
     {
         // 获取需要推送的用户设备
-        $registration_ids = $this->where('user_id','in',$userArray)->column('only_id');
+        // $registration_ids = $this->where('user_id','in',$userArray)->column('only_id');
         $client = new Client(Config::APP_KEY,Config::SECRET);
+        if(isset($extras['type'])) {
+            return $msg = [
+                'code'  => '0',
+                'msg'   => '参数错误',
+            ];
+        } elseif($extras['type'] == '1') {
+            // 求救信号
+            if($extras['cry_id'] == '') {
+                return $msg = [
+                  'code' => '0',
+                  'msg' => '参数错误',
+                ];
+            }
+        }
         try {
             $response = $client->push()
                 ->setPlatform(array('ios', 'android'))
                 // 一般情况下，关于 audience 的设置只需要调用 addAlias、addTag、addTagAnd  或 addRegistrationId
                 // 这四个方法中的某一个即可，这里仅作为示例，当然全部调用也可以，多项 audience 调用表示其结果的交集
                 // 即是说一般情况下，下面三个方法和没有列出的 addTagAnd 一共四个，只适用一个便可满足大多数的场景需求
-
-                // ->addAlias('alias')
+                // 推送别用
+                ->addAlias($userArray)
                 // ->addTag(array('tag1', 'tag2'))
-                ->addRegistrationId($registration_ids)
+                // ->addRegistrationId($registration_ids)
 
-                ->setNotificationAlert('Hi, JPush')
-                ->iosNotification('Hello IOS', array(
+                ->setNotificationAlert($alert)
+                ->iosNotification($alert, array(
                     'sound' => 'sound.caf',
                     // 'badge' => '+1',
                     // 'content-available' => true,
                     // 'mutable-content' => true,
                     'category' => 'jiguang',
-                    'extras' => array(
-                        'key' => 'value',
-                    ),
+                    'extras' => $extras,
                 ))
-                ->androidNotification('Hello Android', array(
-                    'title' => 'hello jpush',
+                ->androidNotification($alert, array(
+                    'title' => $title,
                     // 'builder_id' => 2,
-                    'extras' => array(
-                        'key' => 'value',
-                    ),
+                    'extras' => $extras,
                 ))
                 ->message('message content', array(
                     'title' => 'hello jpush',
@@ -112,14 +122,26 @@ class Jpush extends Model
                     // 'big_push_duration' => 1
                 ))
                 ->send();
-            print_r($response);
+            return $msg = [
+                'code' => '1',
+                'msg'   => '推送成功',
+                'data'  => $response,
+            ];
 
         } catch (\JPush\Exceptions\APIConnectionException $e) {
             // try something here
-            print $e;
+            // print $e;
+            return $msg = [
+                'code' => '0',
+                'msg'   => $e->getMessage(),
+            ];
         } catch (\JPush\Exceptions\APIRequestException $e) {
             // try something here
-            print $e;
+            // print $e;
+            return $msg = [
+                'code' => '0',
+                'msg'   => $e->getMessage(),
+            ];
         }
     }
 

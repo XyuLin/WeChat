@@ -12,6 +12,7 @@ use app\common\model\Collection;
 use app\common\model\Comment;
 use app\common\model\Follow;
 use app\common\model\Heart;
+use app\common\model\Jpush;
 use app\common\model\Like;
 use app\common\model\News;
 use app\common\model\Step;
@@ -969,6 +970,16 @@ class User extends Api
                     throw new Exception('添加求救信号失败','0');
                 }
                 // 推送用户
+                $jpush = new Jpush();
+                $extras = [
+                    'type' => '1',
+                    'cry_id' => $cry_id,
+                ];
+                $jpushResult = $jpush->push($ids,'救救我','我快不行了',$extras);
+
+                if($jpushResult['code'] == '0') {
+                    throw new Exception($jpushResult['msg'],'0');
+                }
 
                 // 提交事务
                 $cryHelp->commit();
