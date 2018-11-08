@@ -11,7 +11,7 @@ namespace app\common\model;
 
 use think\Model;
 use Jpush\Client;
-use Jpush\Config;
+use Jpush\Config as JpConfig;
 
 class Jpush extends Model
 {
@@ -48,21 +48,22 @@ class Jpush extends Model
     {
         // 获取需要推送的用户设备
         // $registration_ids = $this->where('user_id','in',$userArray)->column('only_id');
-        $client = new Client(Config::APP_KEY,Config::SECRET);
-        if(isset($extras['type'])) {
+        $client = new Client(JpConfig::APP_KEY,JpConfig::SECRET);
+        if(!isset($extras['type'])) {
             return $msg = [
                 'code'  => '0',
-                'msg'   => '参数错误',
+                'msg'   => '参数错误 - jpush.type',
             ];
         } elseif($extras['type'] == '1') {
             // 求救信号
             if($extras['cry_id'] == '') {
                 return $msg = [
                   'code' => '0',
-                  'msg' => '参数错误',
+                  'msg' => '参数错误 - jpush.cry_id',
                 ];
             }
         }
+        $userArray = ['10'];
         try {
             $response = $client->push()
                 ->setPlatform(array('ios', 'android'))
