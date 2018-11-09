@@ -24,6 +24,13 @@ class CryHelp extends Model
     // 呼救 给附近的人发出信号
     public function callForHelp($user,$cry_id = '')
     {
+        // 判断用户是否接单施救任务
+        $rescue = new Rescue();
+        $info = $rescue->where('invited_id',$user)->where('status','in','1,2')->find();
+        if($info != null) {
+            $info->status = '4';
+            $info->save();
+        }
         // 如果求救信号为空 则发出求救信号
         if($cry_id == '') {
             $param = [
@@ -67,6 +74,9 @@ class CryHelp extends Model
             $info->status = '4';
             $rescue->where('id','in',$list)->update([
                 'status' => '6',  // 被取消
+            ]);
+            $rescue->where('cry_id',$cry_id)->where('status','1')->update([
+                'status' => '6',
             ]);
         } else {
             // 完成
@@ -124,5 +134,17 @@ class CryHelp extends Model
             }
         }
         return $data;
+    }
+
+    // 检测用户是否求救
+    static public function checkIsCry($user)
+    {
+        $info = self::where('user_id',$user)->where('status','not in','3,4')->find();
+
+        if($info != null) {
+            return $info;
+        } else {
+            return NULL;
+        }
     }
 }

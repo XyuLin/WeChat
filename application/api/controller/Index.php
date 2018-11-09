@@ -5,14 +5,16 @@ namespace app\api\controller;
 use app\admin\command\Api\library\Extractor;
 use app\admin\model\Banner;
 use app\common\controller\Api;
+use app\common\library\token\driver\Redis;
 use app\common\model\Article;
+use app\common\model\CryHelp;
 use app\common\model\Follow;
 use app\common\model\Heart;
 use app\common\model\Jpush;
 use app\common\model\motion\Num;
+use app\common\model\Rescue;
 use app\common\model\Step;
 use JPush\Client;
-use mikkle\tp_redis\RedisHash;
 use think\Db;
 use think\Exception;
 
@@ -22,7 +24,7 @@ use think\Exception;
 class Index extends Api
 {
 
-    protected $noNeedLogin = ['findUser', 'test','jpush'];
+    protected $noNeedLogin = ['findUser', 'test','jpush','testRedis','guardRedis'];
     protected $noNeedRight = ['*'];
 
     /**
@@ -48,6 +50,30 @@ class Index extends Api
 
         $data['longTask'] = Num::longTask($user->id, time());
         $data['stepNumber'] = Step::getTodayStepNumber($user->id, time());
+
+        $isCry = CryHelp::checkIsCry($user->id);
+        $isRescue = Rescue::checkIsRescue($user->id);
+        if($isCry == null && $isRescue != null) {
+            $data['signal'] = [
+                'role'  => 'rescue',
+                'cry_id'=> $isRescue->cry_id,
+            ];
+        } elseif($isRescue == null && $isCry != null) {
+            $data['signal'] = [
+                'role'  => 'cry',
+                'cry_id'=> $isCry->id,
+            ];
+        } elseif($isCry != null && $isRescue != null) {
+            $data['signal'] = [
+                'role'  => 'cry',
+                'cry_id'=> $isCry->id,
+            ];
+
+            $isRescue->status = '4';
+            $isRescue->save();
+        } else {
+            $data['signal'] = [];
+        }
 
         $this->success('请求成功', $data);
     }
@@ -191,4 +217,36 @@ class Index extends Api
         $result = $Jpush->push(['10'],'','',$extras);
         halt($result);
     }
+
+    public function testRedis()
+    {
+        $redis = \mikkle\tp_redis\Redis::instance();
+        for($i=0;$i<50;$i++) {
+            try {
+                $redis->lpush('click', $i);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+        }
+    }
+
+    public function guardRedis()
+    {
+        $redis = \mikkle\tp_redis\Redis::instance();
+        halt($redis);
+        echo $redis->Llen('click');die;
+        while(true){
+            try {
+                $value = $redis->lpop('click');
+                if(!$value) {
+                    break;
+                }
+                dump($value);
+            } catch(Exception $e) {
+                echo $e->getMessage();
+            }
+
+        }
+    }
+
 }

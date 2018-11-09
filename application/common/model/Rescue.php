@@ -22,13 +22,27 @@ class Rescue extends Model
     // 发送援助请求
     public function pushAid($cry_id,$ids)
     {
-        // 循环呼救，找出未接受到呼救信息的用户。
+        $cryModel = new CryHelp();
+        // 循环呼救，找出该条信号已接收接受到呼救信息的用户。
         $invited_id = $this->where('cry_id',$cry_id)->column('invited_id');
-        if(!empty($invited_id)){
-            // 找出两者之间不同的用户
-            $ids = array_diff($invited_id,$ids);
-        }
+        // 找出已经接受其他呼救的用户
+        $busy = $this->where('status','in','1,2')->column('invited_id');
 
+        // 找出正在发送呼救的用户
+        $cryUser = $cryModel->where('status','not in','3,4')->where('id','neq',$cry_id)->column('user_id');
+        $invited_id = array_merge($invited_id,$busy);
+        $invited_id = array_merge($invited_id,$cryUser);
+
+        if(!empty($invited_id)){
+            // 找出两者之间不同的用户 过滤已接收的用户或者忙碌的用户
+            $invited_id = array_unique($invited_id);
+            foreach ($ids as $key => $value) {
+                if(in_array($value,$invited_id)) {
+                    unset($ids[$key]);
+                }
+            }
+            // $ids = array_diff($invited_id,$ids);
+        }
         if(empty($ids)) {
             return true;
         }
@@ -116,6 +130,18 @@ class Rescue extends Model
             return false;
         } else {
             return true;
+        }
+    }
+
+    // 检测用户是否施救
+    static public function checkIsRescue($user)
+    {
+        // 查询是否有求救信号或者接单记录
+        $info = self::where('invited_id',$user)->where('status','in','1,2')->find();
+        if($info != null) {
+            return $info;
+        } else {
+            return NULL;
         }
     }
 }
