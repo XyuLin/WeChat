@@ -54,16 +54,19 @@ class Index extends Api
         $isCry = CryHelp::checkIsCry($user->id);
         $isRescue = Rescue::checkIsRescue($user->id);
         if($isCry == null && $isRescue != null) {
+            $data['isSignal'] = true;
             $data['signal'] = [
                 'role'  => 'rescue',
                 'cry_id'=> $isRescue->cry_id,
             ];
         } elseif($isRescue == null && $isCry != null) {
+            $data['isSignal'] = true;
             $data['signal'] = [
                 'role'  => 'cry',
                 'cry_id'=> $isCry->id,
             ];
         } elseif($isCry != null && $isRescue != null) {
+            $data['isSignal'] = true;
             $data['signal'] = [
                 'role'  => 'cry',
                 'cry_id'=> $isCry->id,
@@ -72,6 +75,7 @@ class Index extends Api
             $isRescue->status = '4';
             $isRescue->save();
         } else {
+            $data['isSignal'] = false;
             $data['signal'] = [];
         }
 
