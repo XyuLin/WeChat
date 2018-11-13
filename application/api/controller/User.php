@@ -969,6 +969,8 @@ class User extends Api
                 // 如果添加求救信号出错 则回滚数据
                 if($result == false) {
                     throw new Exception('添加求救信号失败','0');
+                } elseif(is_string($result)) {
+                    throw new Exception($result,'0');
                 }
                 // 推送用户
                 $jpush = new Jpush();

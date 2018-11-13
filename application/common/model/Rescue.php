@@ -25,6 +25,11 @@ class Rescue extends Model
         $cryModel = new CryHelp();
         // 循环呼救，找出该条信号已接收接受到呼救信息的用户。
         $invited_id = $this->where('cry_id',$cry_id)->column('invited_id');
+        if(empty($invited_id)) {
+            $isEmpty = true;
+        } else {
+            $isEmpty = false;
+        }
         // 找出已经接受其他呼救的用户
         $busy = $this->where('status','in','1,2')->column('invited_id');
 
@@ -47,7 +52,11 @@ class Rescue extends Model
         }
         //halt($ids);
         if(empty($ids)) {
-            return true;
+            if($isEmpty == true) {
+                return '附近未检测到空闲用户!';
+            } else {
+                return true;
+            }
         }
         $array = [];
         foreach ($ids as $value) {
