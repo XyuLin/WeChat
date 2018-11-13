@@ -32,6 +32,8 @@ class Rescue extends Model
         $cryUser = $cryModel->where('status','not in','3,4')->where('id','neq',$cry_id)->column('user_id');
         $invited_id = array_merge($invited_id,$busy);
         $invited_id = array_merge($invited_id,$cryUser);
+        dump($ids);
+        dump($invited_id);
 
         if(!empty($invited_id)){
             // 找出两者之间不同的用户 过滤已接收的用户或者忙碌的用户
@@ -43,6 +45,7 @@ class Rescue extends Model
             }
             // $ids = array_diff($invited_id,$ids);
         }
+        halt($ids);
         if(empty($ids)) {
             return true;
         }
