@@ -43,7 +43,7 @@ class Map extends Model
     }
 
     // 检索 搜寻附近 1km(变量) 的用户。
-    public function retrieval($user,$lat = '',$lng = '',$unit = 1)
+    public function retrieval($user,$lat = '',$lng = '',$unit = 5)
     {
         if(!empty($lat) && !empty($lng)) {
             $core = $this->depositInLatLng($user,$lat,$lng);

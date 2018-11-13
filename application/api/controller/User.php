@@ -338,6 +338,7 @@ class User extends Api
         $platform = $this->request->request("platform");
         $code = $this->request->request("code");
         $config = get_addon_config('third');
+        halt($config);
         if (!$config || !isset($config[$platform]))
         {
             $this->error(__('Invalid parameters'));

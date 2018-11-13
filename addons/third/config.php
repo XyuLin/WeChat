@@ -38,8 +38,8 @@ return array(
                 ),
             'value'   =>
                 array(
-                    'app_id'     => '100000000',
-                    'app_secret' => '123456',
+                    'app_id'     => '',
+                    'app_secret' => '',
                     'scope'      => 'snsapi_base',
                 ),
             'rule'    => 'required',
