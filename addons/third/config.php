@@ -8,8 +8,8 @@ return array(
             'type'    => 'array',
             'content' =>
                 array(
-                    'app_id'     => '',
-                    'app_secret' => '',
+                    'app_id'     => '1107885293',
+                    'app_secret' => 'CcSIFha4QvRyX6yI',
                     'scope'      => 'get_user_info',
                 ),
             'value'   =>

@@ -338,7 +338,6 @@ class User extends Api
         $platform = $this->request->request("platform");
         $code = $this->request->request("code");
         $config = get_addon_config('third');
-        halt($config);
         if (!$config || !isset($config[$platform]))
         {
             $this->error(__('Invalid parameters'));
@@ -720,6 +719,7 @@ class User extends Api
         $user = $this->auth->getUser();
         $care_id = $this->request->param('care_id');
         $tips = $this->request->param('tips');
+        $memo_name = $this->request->param('memo_name');
         if($user['id'] == $care_id) $this->error('不可添加自己为牵挂的人!');
         $care = $user->where('id',$care_id)->find();
         if(empty($care)) $this->error('参数错误, 没有此用户');
@@ -732,8 +732,11 @@ class User extends Api
         if($isExist != null) {
             $this->error('用户已添加过 '.$care['nickname'].' 请勿重复添加');
         }
+        if(empty($memo_name)) {
+            $memo_name = $care['nickname'];
+        }
         $param = array_merge($param,[
-            'memo_name' => $care['nickname'],
+            'memo_name' => $memo_name,
             'tips'      => $tips,
         ]);
         $result = $model->allowField(true)->save($param);
