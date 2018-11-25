@@ -756,6 +756,7 @@ class User extends Api
         $user = $this->auth->getUser();
         $model = new Care();
         $list = $model->where('care_id',$user['id'])->select();
+
         $this->success('请求成功',$list);
     }
 

@@ -44,11 +44,14 @@ class Article extends Backend
                 return $this->selectpage();
             }
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
+            $sort = 'weigh';
+            // halt($order);
             $total = $this->model
                 ->where($where)
                 ->where('type','1')
                 ->order($sort, $order)
                 ->count();
+
 
             $list = $this->model
                 ->where($where)
@@ -80,6 +83,7 @@ class Article extends Backend
             }
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
             // halt($where);
+            $sort = 'weigh';
             $total = $this->model
                 ->where($where)
                 ->where('type','2')

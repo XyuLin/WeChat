@@ -33,8 +33,6 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
-                        {field: 'block_category_id', title: __('Block_category_id'),visible:false,operate:false},
-                        {field: 'block_category_title', title: __('Block_category_id'),operate:false},
                         {field: 'user_id', title: __('User_id'),visible:false},
                         {field: 'user_name', title: __('User_id'),operate:false,operate:false},
                         {field: 'title', title: __('Title')},
@@ -42,6 +40,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'shares', title: __('Shares'),operate:false},
                         {field: 'likes', title: __('Likes'),operate:false},
                         {field: 'comments', title: __('Comments'),operate:false,formatter: Controller.api.commentInfo},
+                        {field: 'weigh', title: __('Weigh'),visible:false},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
@@ -99,6 +98,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'shares', title: __('Shares'),operate:false},
                         {field: 'likes', title: __('Likes'),operate:false},
                         {field: 'comments', title: __('Comments'),operate:false,formatter: Controller.api.commentInfo},
+                        {field: 'weigh', title: __('Weigh'),visible:false},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}

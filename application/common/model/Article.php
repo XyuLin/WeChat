@@ -80,14 +80,14 @@ class Article extends Model
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getHotArticle($category_id = '',$page = '1', $type = '1' )
+    public function getHotArticle($category_id = '',$page = '1')
     {
         if($category_id != '') {
             $array = $this->where('block_category_id',$category_id)->where('type',$type)->limit('10')->page($page)->order('id desc')->select();
             $total = $this->where('block_category_id',$category_id)->where('type',$type)->count();
         } else {
-            $array = $this->where('type',$type)->limit('10')->page($page)->order('id desc')->select();
-            $total = $this->where('type',$type)->count();
+            $array = $this->limit('10')->page($page)->order('id desc')->select();
+            $total = $this->count();
         }
 
         $data['list'] = $this->splicingUrl($array);

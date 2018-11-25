@@ -18,29 +18,14 @@ class Article extends Model
     
     // 追加属性
     protected $append = [
-        'block_category_title',
         'user_name'
     ];
-
-    public function BlockCategory()
-    {
-        return  $this->belongsTo('app\admin\model\block\Category','block_category_id');
-    }
 
     public function User()
     {
         return $this->belongsTo('app\admin\model\User','user_id');
     }
 
-    public function getBlockCategoryTitleAttr()
-    {
-        // dump($this->BlockCategory);
-        if($this->BlockCategory != null) {
-            return $this->BlockCategory->title;
-        } else {
-            return '此类型已删除!';
-        }
-    }
 
     public function getUserNameAttr()
     {
