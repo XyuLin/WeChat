@@ -22,7 +22,6 @@ class Article extends Model
 
     protected $append = [
         'create_text',
-        'block_category_text'
     ];
 
     public function getCreateTextAttr($value,$data)
@@ -38,16 +37,6 @@ class Article extends Model
     public function getUpdatetimeAttr($value,$data)
     {
         return date('Y-m-d H:i',$value);
-    }
-
-    public function getBlockCategoryTextAttr($value,$data)
-    {
-        $model = new BlockCategory();
-        if($name = $model->where('id',$data['block_category_id'])->value('title')) {
-            return $name;
-        } else {
-            return '';
-        }
     }
 
     public function User()
