@@ -25,10 +25,10 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id'), sortable: true},
-                        {field: 'group.name', title: __('Group')},
+                        {field: 'group.name', title: __('Group'), visible: false,operate: false},
                         {field: 'username', title: __('Username'), operate: 'LIKE'},
                         {field: 'nickname', title: __('Nickname'), operate: 'LIKE'},
-                        {field: 'email', title: __('Email'), operate: 'LIKE'},
+                        {field: 'email', title: __('Email'), visible: false,operate: false},
                         {field: 'mobile', title: __('Mobile'), operate: 'LIKE'},
                         {field: 'avatar', title: __('Avatar'), formatter: Table.api.formatter.image, operate: false},
                         {field: 'level', title: __('Level'), operate: 'BETWEEN', sortable: true, visible:false},

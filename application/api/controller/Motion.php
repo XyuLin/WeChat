@@ -12,6 +12,7 @@ namespace app\api\controller;
 use app\common\controller\Api;
 use app\common\model\motion\Module;
 use app\common\model\motion\Num;
+use think\Db;
 
 class Motion extends Api
 {
@@ -71,6 +72,16 @@ class Motion extends Api
         $model = new Num();
         $result = $model->getUserRecord($user->id);
         $this->success('请求成功!',$result);
+    }
+
+    public function getTaskInfo()
+    {
+        $id = $this->request->param('id');
+        $info = Db::name('motion_task')->where('id',$id)->find();
+        $url = \think\Config::get('url');
+        $info['url'] = $url.$info['url'];
+        $info['image'] = $url.$info['image'];
+        $this->success('请求成功',$info);
     }
 
 }

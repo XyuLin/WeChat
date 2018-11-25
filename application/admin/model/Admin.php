@@ -2,6 +2,7 @@
 
 namespace app\admin\model;
 
+use think\Db;
 use think\Model;
 use think\Session;
 
@@ -14,6 +15,10 @@ class Admin extends Model
     protected $createTime = 'createtime';
     protected $updateTime = 'updatetime';
 
+    protected $append = [
+        'city_name',
+        'province_name',
+    ];
     /**
      * 重置用户密码
      * @author baiyouwen
@@ -31,4 +36,15 @@ class Admin extends Model
         return $encrypt($password . $salt);
     }
 
+    public function getCityNameAttr($value,$data)
+    {
+        $value = Db::name('area')->where('id',$data['city'])->value('name');
+        return $value;
+    }
+
+    public function getProvinceNameAttr($value,$data)
+    {
+        $value = Db::name('area')->where('id',$data['province'])->value('name');
+        return $value;
+    }
 }
