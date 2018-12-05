@@ -131,6 +131,8 @@ class Admin extends Backend
         if ($this->request->isPost())
         {
             $params = $this->request->post("row/a");
+            $params['province'] = $this->request->post('province/s');
+            $params['city'] = $this->request->post('city/s');
             if ($params)
             {
                 $params['salt'] = Random::alnum();
@@ -169,6 +171,8 @@ class Admin extends Backend
         if ($this->request->isPost())
         {
             $params = $this->request->post("row/a");
+            $params['province'] = $this->request->post('province/s');
+            $params['city'] = $this->request->post('city/s');
             if ($params)
             {
                 if ($params['password'])

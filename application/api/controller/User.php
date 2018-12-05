@@ -27,7 +27,7 @@ use think\Validate;
  */
 class User extends Api
 {
-    protected $noNeedLogin = ['login', 'mobilelogin', 'register', 'resetpwd', 'changeemail', 'changemobile', 'third'];
+    protected $noNeedLogin = ['login', 'mobilelogin', 'register', 'resetpwd', 'changeemail', 'changemobile', 'third','thirdParty'];
     protected $noNeedRight = '*';
 
     public function _initialize()
@@ -364,7 +364,16 @@ class User extends Api
 
     public function thirdParty()
     {
-
+        $platform = $this->request->request("platform");
+        $openid = $this->request->param('openid');
+        $loginret = \addons\third\library\Service::connects($platform, $openid);
+        if ($loginret)
+        {
+            $data = [
+                'userinfo'  => $this->auth->getUserinfo()
+            ];
+            $this->success(__('Logged in successful'), $data);
+        }
     }
 
     /**
@@ -756,6 +765,12 @@ class User extends Api
         $user = $this->auth->getUser();
         $model = new Care();
         $list = $model->where('care_id',$user['id'])->select();
+        $url = Config::get('url');
+        foreach ($list as &$value) {
+            $user = \app\common\model\User::get($value['care_id']);
+            $value['avatar'] = $url . $user['avatar'];
+        }
+        unset($value);
 
         $this->success('请求成功',$list);
     }

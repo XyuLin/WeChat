@@ -86,4 +86,65 @@ class Service
         }
     }
 
+
+    /**
+     * 第三方登录 变更
+     */
+    public static function connects($platform, $openid)
+    {
+        $time = time();
+        $values = [
+            'platform'      => $platform,
+            'openid'        => $openid,
+            'openname'      => '',
+            'access_token'  => '',
+            'refresh_token' => '',
+            'expires_in'    => '',
+            'logintime'     => $time,
+            'expiretime'    => '',
+        ];
+        $auth = \app\common\library\Auth::instance();
+
+        $auth->keeptime(0);
+        $third = Third::get(['platform' => $platform, 'openid' => $openid]);
+        if ($third) {
+            $user = User::get($third['user_id']);
+            if (!$user) {
+                return FALSE;
+            }
+            $third->save($values);
+            return $auth->direct($user->id);
+        } else {
+            // 先随机一个用户名,随后再变更为u+数字id
+            $username = Random::alnum(20);
+            $password = Random::alnum(6);
+
+            Db::startTrans();
+            try {
+                // 默认注册一个会员
+                $result = $auth->register($password, '', [] );
+                if (!$result) {
+                    return FALSE;
+                }
+                $user = $auth->getUser();
+                $fields = ['username' => 'u' . $user->id];
+                // 更新会员资料
+                $user = User::get($user->id);
+                $user->save($fields);
+
+                // 保存第三方信息
+                $values['user_id'] = $user->id;
+                Third::create($values);
+                Db::commit();
+            } catch (PDOException $e) {
+                Db::rollback();
+                $auth->logout();
+                return FALSE;
+            }
+
+            // 写入登录Cookies和Token
+            return $auth->direct($user->id);
+        }
+    }
+
 }

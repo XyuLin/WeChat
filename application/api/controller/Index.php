@@ -3,9 +3,14 @@
 namespace app\api\controller;
 
 use app\admin\command\Api\library\Extractor;
+use app\admin\model\Admin;
+use app\admin\model\apply\Pass;
+use app\admin\model\Area;
 use app\admin\model\Banner;
+use app\admin\model\Enter;
 use app\common\controller\Api;
 use app\common\library\token\driver\Redis;
+use app\common\model\Activity;
 use app\common\model\Article;
 use app\common\model\CryHelp;
 use app\common\model\Follow;
@@ -24,7 +29,7 @@ use think\Exception;
 class Index extends Api
 {
 
-    protected $noNeedLogin = ['findUser', 'test','jpush','testRedis','guardRedis'];
+    protected $noNeedLogin = ['findUser', 'test', 'jpush', 'testRedis', 'guardRedis'];
     protected $noNeedRight = ['*'];
 
     /**
@@ -53,23 +58,23 @@ class Index extends Api
 
         $isCry = CryHelp::checkIsCry($user->id);
         $isRescue = Rescue::checkIsRescue($user->id);
-        if($isCry == null && $isRescue != null) {
+        if ($isCry == null && $isRescue != null) {
             $data['isSignal'] = true;
             $data['signal'] = [
-                'role'  => 'rescue',
-                'cry_id'=> $isRescue->cry_id,
+                'role' => 'rescue',
+                'cry_id' => $isRescue->cry_id,
             ];
-        } elseif($isRescue == null && $isCry != null) {
+        } elseif ($isRescue == null && $isCry != null) {
             $data['isSignal'] = true;
             $data['signal'] = [
-                'role'  => 'cry',
-                'cry_id'=> $isCry->id,
+                'role' => 'cry',
+                'cry_id' => $isCry->id,
             ];
-        } elseif($isCry != null && $isRescue != null) {
+        } elseif ($isCry != null && $isRescue != null) {
             $data['isSignal'] = true;
             $data['signal'] = [
-                'role'  => 'cry',
-                'cry_id'=> $isCry->id,
+                'role' => 'cry',
+                'cry_id' => $isCry->id,
             ];
 
             $isRescue->status = '4';
@@ -209,6 +214,82 @@ class Index extends Api
         $page = $this->request->param('page/s');
         $list = $model->getHotArticle('', $page, '2');
         $this->success('请求成功', $list);
+    }
+
+    // 城市列表
+    public function getCityList()
+    {
+//        $model = new Admin();
+//        $list = $model->where('city','neq','0')->column('city');
+//        if(!empty($list)) {
+            $cityList = Db::name('area')->field('id,name')->where('level','2')->select();
+            $this->success('请求成功!',$cityList);
+//        } else {
+//            $this->success('请求成功!',[]);
+//        }
+    }
+
+    // 活动列表
+    public function getActivityList()
+    {
+        $model = new Activity();
+        $city_id = $this->request->param('city_id/s');
+        $list = $model->where('city_id',$city_id)->select();
+        $this->success(
+            '请求成功!',$list
+        );
+    }
+
+    // 报名活动
+    public function signUp()
+    {
+        $user = $this->auth->getUser();
+        $param = [
+            'full_name' => 'name/s',
+            'jointime'  => 'jointime/s',
+            'mobile'    => 'mobile/s',
+            'wechat_id' => 'wechat/s',
+            'city_name' => 'city_name/s',
+            'city_id'   => 'city_id/s',
+        ];
+        $params = $this->buildParam($param);
+        $params['user_id'] = $user->id;
+        $model = new Enter();
+        $info = $model->create($params);
+        if($info) {
+            $this->success('报名成功!');
+        } else {
+            $this->error('报名失败!');
+        }
+
+    }
+
+    // 申请证书
+    public function applyPass()
+    {
+        $user = $this->auth->getUser();
+        $model = new Pass();
+        $param = [
+            'full_name' => 'name/s',
+            'mobile'    => 'mobile/s',
+            'id_photo'  => 'id_photo/s',
+            'prove_images'  => 'prove/a',
+            'prove_desc'    => 'prove_desc/s',
+            'city_name' => 'city_name/s',
+            'city_id'   => 'city_id/s',
+
+        ];
+
+        $params = $this->buildParam($param);
+        $params['prove_images'] = implode(',',$params['prove_images']);
+        $params['user_id'] = $user->id;
+
+        $info = $model->create($params);
+        if($info) {
+            $this->success('申请成功!');
+        } else {
+            $this->error('申请失败!');
+        }
     }
 
     public function jpush()
