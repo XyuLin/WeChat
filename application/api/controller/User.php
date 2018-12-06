@@ -373,6 +373,8 @@ class User extends Api
                 'userinfo'  => $this->auth->getUserinfo()
             ];
             $this->success(__('Logged in successful'), $data);
+        } else {
+            $this->success('授权登录失败!');
         }
     }
 
