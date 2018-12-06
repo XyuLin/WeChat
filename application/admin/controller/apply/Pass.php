@@ -2,6 +2,7 @@
 
 namespace app\admin\controller\apply;
 
+use app\admin\model\User;
 use app\common\controller\Backend;
 
 /**
@@ -22,7 +23,7 @@ class Pass extends Backend
     {
         parent::_initialize();
         $this->model = new \app\admin\model\apply\Pass;
-
+        $this->view->assign("statusList", $this->model->getStatusList());
     }
     
     /**
@@ -30,6 +31,27 @@ class Pass extends Backend
      * 因此在当前控制器中可不用编写增删改查的代码,除非需要自己控制这部分逻辑
      * 需要将application/admin/library/traits/Backend.php中对应的方法复制到当前控制器,然后进行修改
      */
-    
+
+
+    public function operation()
+    {
+        $id = $this->request->request('ids');
+        $type = $this->request->request('type/s');
+        $row = $this->model->where('id',$id)->find();
+        if($type == '1') {
+            $row->status = '1';
+            $row->save();
+            $user = User::get($row['user_id']);
+            $user->is_pass = '1';
+            $user->save();
+
+            $this->success('审核通过!');
+        } else {
+            $row->status = '2';
+            $row->save();
+
+            $this->success('审核不通过!');
+        }
+    }
 
 }

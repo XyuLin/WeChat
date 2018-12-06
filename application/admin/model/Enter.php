@@ -18,18 +18,30 @@ class Enter extends Model
     
     // 追加属性
     protected $append = [
-        'jointime_text'
+        'jointime_text',
+        'status_text'
     ];
     
 
     
-
+    public function getStatusList()
+    {
+        return ['0' => __('Status 0'),'1' => __('Status 1'),'2' => __('Status 2')];
+    }     
 
 
     public function getJointimeTextAttr($value, $data)
     {
         $value = $value ? $value : (isset($data['jointime']) ? $data['jointime'] : '');
         return is_numeric($value) ? date("Y-m-d H:i:s", $value) : $value;
+    }
+
+
+    public function getStatusTextAttr($value, $data)
+    {        
+        $value = $value ? $value : (isset($data['status']) ? $data['status'] : '');
+        $list = $this->getStatusList();
+        return isset($list[$value]) ? $list[$value] : '';
     }
 
     protected function setJointimeAttr($value)

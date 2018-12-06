@@ -19,6 +19,7 @@ use app\common\model\Jpush;
 use app\common\model\motion\Num;
 use app\common\model\Rescue;
 use app\common\model\Step;
+use fast\Tree;
 use JPush\Client;
 use think\Db;
 use think\Exception;
@@ -222,8 +223,12 @@ class Index extends Api
 //        $model = new Admin();
 //        $list = $model->where('city','neq','0')->column('city');
 //        if(!empty($list)) {
-            $cityList = Db::name('area')->field('id,name')->where('level','2')->select();
-            $this->success('请求成功!',$cityList);
+        $array = Db::name('area')->field('pid,id,name')->where('level','neq','3')->select();
+        $tree = new Tree();
+        $tree->init($array,'pid');
+        $result = $tree->getTreeArray('0','name','false');
+            // $cityList = Db::name('area')->field('id,name')->where('level','2')->select();
+            $this->success('请求成功!',$result);
 //        } else {
 //            $this->success('请求成功!',[]);
 //        }
@@ -244,6 +249,9 @@ class Index extends Api
     public function signUp()
     {
         $user = $this->auth->getUser();
+        if($user->is_enter == '1') {
+            $this->error('您的证书已申请成功!不可重复申请!');
+        }
         $param = [
             'full_name' => 'name/s',
             'jointime'  => 'jointime/s',
@@ -268,6 +276,10 @@ class Index extends Api
     public function applyPass()
     {
         $user = $this->auth->getUser();
+
+        if($user->is_pass == '1') {
+            $this->error('您已报名并且以通过审核!不可重复申请!');
+        }
         $model = new Pass();
         $param = [
             'full_name' => 'name/s',
@@ -277,7 +289,6 @@ class Index extends Api
             'prove_desc'    => 'prove_desc/s',
             'city_name' => 'city_name/s',
             'city_id'   => 'city_id/s',
-
         ];
 
         $params = $this->buildParam($param);

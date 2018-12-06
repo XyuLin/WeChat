@@ -414,10 +414,11 @@ class Tree
      * 获取树状数组
      * @param string $myid 要查询的ID
      * @param string $nametpl 名称条目模板
+     * @param string $isHave 是否加入特殊符号
      * @param string $itemprefix 前缀
      * @return string
      */
-    public function getTreeArray($myid, $itemprefix = '')
+    public function getTreeArray($myid, $itemprefix = '',$isHave = '')
     {
         $childs = $this->getChild($myid);
         $n = 0;
@@ -440,9 +441,11 @@ class Tree
                     $k = $itemprefix ? $this->icon[0] : '';
                 }
                 $spacer = $itemprefix ? $itemprefix . $j : '';
-                $value['spacer'] = $spacer;
+                if($isHave == '') {
+                    $value['spacer'] = $spacer;
+                }
                 $data[$n] = $value;
-                $data[$n]['childlist'] = $this->getTreeArray($id, $itemprefix . $k . $this->nbsp);
+                $data[$n]['childlist'] = $this->getTreeArray($id, $itemprefix . $k . $this->nbsp,$isHave);
                 $n++;
                 $number++;
             }
