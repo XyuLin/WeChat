@@ -292,6 +292,11 @@ class Index extends Api
         ];
 
         $params = $this->buildParam($param);
+        $code = $this->request->param('code/s');
+        $result = \app\common\library\Sms::check($params['mobile'],$code,'apply');
+        if(!$result) {
+            $this->error('验证码错误');
+        }
         $params['prove_images'] = implode(',',$params['prove_images']);
         $params['user_id'] = $user->id;
 
