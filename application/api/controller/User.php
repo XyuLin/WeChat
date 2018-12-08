@@ -88,6 +88,7 @@ class User extends Api
             'urgent_phone_two'      => 'two_phone/s',
             'urgent_contact_two'    => 'two_contact/s',
             'avatar'                => 'avatar/s',
+            'block_category_ids'    => 'block_ids/s',
         ];
 
         $save_param = array_filter($this->buildParam($param));

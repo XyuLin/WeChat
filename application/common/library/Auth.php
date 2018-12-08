@@ -28,7 +28,7 @@ class Auth
     protected $options = [];
     protected $allowFields = ['id', 'username', 'nickname', 'mobile', 'avatar', 'weight','height','age',
         'address','gender','urgent_phone_one','urgent_contact_one','urgent_contact_two','urgent_phone_two','blood_type',
-        'rescue_num','dial_num','go_scene_num','cpr_num'];
+        'rescue_num','dial_num','go_scene_num','cpr_num','is_pass','is_enter','block_category_ids'];
 
     public function __construct($options = [])
     {

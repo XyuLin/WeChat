@@ -20,4 +20,9 @@ class Block extends Model
     protected $createTime = 'createtime';
     protected $updateTime = 'updatetime';
 
+
+    public function BlockCategory()
+    {
+        return $this->hasMany('BlockCategory');
+    }
 }

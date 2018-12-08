@@ -12,6 +12,7 @@ use app\common\controller\Api;
 use app\common\library\token\driver\Redis;
 use app\common\model\Activity;
 use app\common\model\Article;
+use app\common\model\Block;
 use app\common\model\CryHelp;
 use app\common\model\Follow;
 use app\common\model\Heart;
@@ -300,6 +301,34 @@ class Index extends Api
         } else {
             $this->error('申请失败!');
         }
+    }
+
+    public function getCase()
+    {
+        $model = new Block();
+        $list = $model->field('id,title')
+            ->with(['BlockCategory'=>function($query) {
+                $query->field('id,title,block_id');
+            }])->select();
+        $list = collection($list)->toArray();
+        $user = $this->auth->getUser();
+        $inArr = explode(',',$user->block_category_ids);
+        if($inArr != '') {
+            foreach($list as &$value) {
+                if(is_array($value['block_category'])) {
+                    foreach ($value['block_category'] as &$v) {
+                        if(in_array($v['id'],$inArr)) {
+                            $v['isBind'] = true;
+                        } else {
+                            $v['isBind'] = false;
+                        }
+                    }
+                    unset($v);
+                }
+            }
+            unset($value);
+        }
+        $this->success('请求成功!',$list);
     }
 
     public function jpush()
