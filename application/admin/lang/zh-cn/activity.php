@@ -9,6 +9,7 @@ return [
     'Contact'  =>  '联系人',
     'Mobile'  =>  '联系方式',
     'Organize'  =>  '组织',
+    'Image'  =>  '宣传图',
     'Contents'  =>  '活动内容',
     'Createtime'  =>  '发布时间',
     'Updatetime'  =>  '修改时间'

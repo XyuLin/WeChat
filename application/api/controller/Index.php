@@ -220,18 +220,12 @@ class Index extends Api
     // 城市列表
     public function getCityList()
     {
-//        $model = new Admin();
-//        $list = $model->where('city','neq','0')->column('city');
-//        if(!empty($list)) {
+
         $array = Db::name('area')->field('pid,id,name')->where('level','neq','3')->select();
         $tree = new Tree();
         $tree->init($array,'pid');
         $result = $tree->getTreeArray('0','name','false');
-            // $cityList = Db::name('area')->field('id,name')->where('level','2')->select();
-            $this->success('请求成功!',$result);
-//        } else {
-//            $this->success('请求成功!',[]);
-//        }
+        $this->success('请求成功!',$result);
     }
 
     // 活动列表
@@ -250,7 +244,7 @@ class Index extends Api
     {
         $user = $this->auth->getUser();
         if($user->is_enter == '1') {
-            $this->error('您的证书已申请成功!不可重复申请!');
+            $this->error('您已报名并且以通过审核!不可重复申请!');
         }
         $param = [
             'full_name' => 'name/s',
@@ -261,6 +255,11 @@ class Index extends Api
             'city_id'   => 'city_id/s',
         ];
         $params = $this->buildParam($param);
+        $code = $this->request->param('code/s');
+        $result = \app\common\library\Sms::check($params['mobile'],$code,'enter');
+        if(!$result) {
+            $this->error('验证码错误');
+        }
         $params['user_id'] = $user->id;
         $model = new Enter();
         $info = $model->create($params);
@@ -275,10 +274,10 @@ class Index extends Api
     // 申请证书
     public function applyPass()
     {
-        $user = $this->auth->getUser();
+        $user = $this->auth->getUser('您的证书已申请成功!不可重复申请!');
 
         if($user->is_pass == '1') {
-            $this->error('您已报名并且以通过审核!不可重复申请!');
+            $this->error();
         }
         $model = new Pass();
         $param = [
