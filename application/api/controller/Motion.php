@@ -70,8 +70,8 @@ class Motion extends Api
     {
         $user = $this->auth->getUser();
         $model = new Num();
-        $month = $this->requset->param('month/s');
-        $year = $this->requset->param('year/s');
+        $month = $this->request->param('month/s');
+        $year = $this->request->param('year/s');
         $result = $model->getUserRecord($user->id,$month,$year);
         $this->success('请求成功!',$result);
     }
