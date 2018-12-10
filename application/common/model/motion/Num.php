@@ -55,7 +55,7 @@ class Num extends Model
     }
 
 
-    public function getUserRecord($user_id,$month = '')
+    public function getUserRecord($user_id,$month = '',$year = '')
     {
         if($month == '') {
             $month = date('m',time());
@@ -66,7 +66,11 @@ class Num extends Model
             }
         }
 
-        $list = $this->where('user_id',$user_id)->where('month',$month)->column('id,day');
+        if($year == '') {
+            $year = date('Y',time());
+        }
+
+        $list = $this->where('user_id',$user_id)->where('year',$year)->where('month',$month)->column('id,day');
 
         $list = array_count_values($list);
 
