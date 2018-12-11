@@ -101,6 +101,20 @@ class User extends Api
         }
     }
 
+    public function getAddressList()
+    {
+        $mobiles = $this->request->param('mobiles/s');
+        $model = new \app\common\model\User();
+
+        $list = $model->field('id,avatar,username,mobile')->where('mobile','in',$mobiles)->select();
+        $url = Config::get('url');
+        foreach ($list as &$value) {
+            $value['avatar'] = $url . $value['avatar'];
+        }
+        unset($value);
+        $this->success('请求成功!',$list);
+    }
+
     /**
      * 会员登录
      * 
@@ -205,6 +219,7 @@ class User extends Api
         $ret = $this->auth->register($password,$mobile, []);
         if ($ret)
         {
+            $this->createCode($this->auth->id,$mobile);
             $data = ['userinfo' => $this->auth->getUserinfo()];
             $this->success(__('Sign up successful'), $data);
         }
@@ -214,6 +229,26 @@ class User extends Api
         }
     }
 
+    public function createCode($user_id,$mobile)
+    {
+        $qrCode = new \Endroid\QrCode\QrCode();
+        $qrCode
+            ->setText('Abbc:'.$mobile)
+            ->setSize('500')
+            ->setPadding('15')
+            ->setErrorCorrection('0')
+            // ->setLogoSize('50')
+            ->setLabelFontPath(ROOT_PATH . 'public/assets/fonts/fzltxh.ttf')
+            //->setLabel('李琳')
+            // ->setLabelFontSize('25')
+            // ->setLabelHalign('0')
+            // ->setLabelValign('2')
+            ->setImageType(\Endroid\QrCode\QrCode::IMAGE_TYPE_PNG);
+        // dump($this->auth->avatar);die;
+        // $qrCode->setLogo(ROOT_PATH . 'public' . $this->auth->avatar);
+        $qrCode->save(ROOT_PATH. 'public/qrCode/'.$user_id .'.jpg');
+        //return new \think\Response($qrCode->get(), 200, ['Content-Type' => $qrCode->getContentType()]);
+    }
     /**
      * 注销登录
      */

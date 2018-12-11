@@ -22,6 +22,7 @@ use app\common\model\Rescue;
 use app\common\model\Step;
 use fast\Tree;
 use JPush\Client;
+use think\Config;
 use think\Db;
 use think\Exception;
 
@@ -86,6 +87,9 @@ class Index extends Api
             $data['signal'] = [];
         }
 
+        $data['video'] = Article::field('id,title,images,createtime')->where('type','2')->order('weigh desc')->find();
+        $url = Config::get('url');
+        $data['video']['images'] = $url . $data['video']['images'];
         $this->success('请求成功', $data);
     }
 

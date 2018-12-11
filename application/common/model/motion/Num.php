@@ -74,7 +74,7 @@ class Num extends Model
 
         $list = array_count_values($list);
 
-        $days = $this->getMonthLastDay($month);
+        $days = $this->getMonthLastDay($month,$year);
         $data = [];
         for ($x=0; $x<$days; $x++) {
             $data[$x]['day'] = $x+1;
@@ -93,8 +93,11 @@ class Num extends Model
         return $data;
     }
 
-    public function getMonthLastDay($month) {
-        $year = date('Y',time());
+    public function getMonthLastDay($month,$year = '') {
+        if($year == '') {
+            $year = date('Y',time());
+        }
+        
         switch ($month) {
             case 4 :
             case 6 :
