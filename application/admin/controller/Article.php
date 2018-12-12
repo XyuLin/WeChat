@@ -112,6 +112,8 @@ class Article extends Backend
     {
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
+
+            halt($params);
             $params['type'] = '1';
             if($params['user_id'] == '') {
                 $params['user_id'] = '1';

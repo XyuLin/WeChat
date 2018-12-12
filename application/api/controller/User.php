@@ -258,7 +258,8 @@ class User extends Api
         if(file_exists(ROOT_PATH . 'public/qrCode/'.$user->id.'.jpg')) {
             $this->success('请求成功!', $path);
         } else {
-            $this->error('初始账号没有二维码!');
+            $this->createCode($user->id,$user->mobile);
+            $this->error('请求成功!', $path);
         }
 
     }
