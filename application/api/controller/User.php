@@ -233,7 +233,7 @@ class User extends Api
     {
         $qrCode = new \Endroid\QrCode\QrCode();
         $qrCode
-            ->setText('Abbc:'.$mobile)
+            ->setText('shouhuan:'.$mobile)
             ->setSize('500')
             ->setPadding('15')
             ->setErrorCorrection('0')
@@ -248,6 +248,19 @@ class User extends Api
         // $qrCode->setLogo(ROOT_PATH . 'public' . $this->auth->avatar);
         $qrCode->save(ROOT_PATH. 'public/qrCode/'.$user_id .'.jpg');
         //return new \think\Response($qrCode->get(), 200, ['Content-Type' => $qrCode->getContentType()]);
+    }
+
+    public function getMyCode()
+    {
+        $user = $this->auth->getUser();
+        $url = Config::get('url');
+        $path = $url.'/qrCode/'.$user->id.'.jpg';
+        if(file_exists(ROOT_PATH . 'public/qrCode/'.$user->id.'.jpg')) {
+            $this->success('请求成功!', $path);
+        } else {
+            $this->error('初始账号没有二维码!');
+        }
+
     }
     /**
      * 注销登录
