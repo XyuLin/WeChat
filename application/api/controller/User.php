@@ -14,6 +14,7 @@ use app\common\model\Follow;
 use app\common\model\Heart;
 use app\common\model\Jpush;
 use app\common\model\Like;
+use app\common\model\Map;
 use app\common\model\News;
 use app\common\model\Step;
 use fast\Random;
@@ -809,7 +810,7 @@ class User extends Api
     }
 
     /**
-     * 新的牵挂
+     * 新的牵挂 牵挂的人是自己。别人添加自己的。
      * adopt 0 未通过 1 已拒绝 2 已通过
      */
     public function newCare()
@@ -853,7 +854,7 @@ class User extends Api
     }
 
     /**
-     * 查找(查看)牵挂的人信息
+     * 查找(查看)牵挂的人信息 查看搜索用户
      */
 
     public function getCareInfo()
@@ -916,6 +917,75 @@ class User extends Api
                 $this->error('修改失败,请重试!');
             }
         }
+    }
+
+    public function openSee()
+    {
+        $user = $this->auth->getUser();
+        if($user['is_see'] == '1') {
+            $user->is_see = 0;
+        } else {
+            $user->is_see = '1';
+        }
+        $user->save();
+        $this->success('请求成功!',$user->is_see);
+    }
+
+    /**
+     *  查看我关注人的详情
+     */
+    public function getCareDetail()
+    {
+        $user = $this->auth->getUser();
+        $care_id = $this->request->param('user_id/s');
+        // 判断用户是否是我的牵挂人
+        $isTrue = Care::where('user_id',$user->id)->where('care_id',$care_id)->where('adopt','2')->find();
+        if($isTrue == null) {
+            $this->error('对方不是您牵挂的人');
+        }
+        $careInfo = \app\common\model\User::field('id,username,mobile,is_see,avatar')->find($care_id);
+        $data['user'] = $careInfo;
+        $data['user']['memo_name'] = $isTrue['memo_name'];
+        $url = Config::get('url');
+        $data['user']['avatar'] = $url.$data['user']['avatar'];
+        $heart = new Heart();
+        $todayTime = todayTime(time());
+        $beginToday = $todayTime['beginTime'];
+        $endToday = $todayTime['endTime'];
+        $newHeart = $heart->where('user_id',$care_id)->where('createtime', 'between', "$beginToday,$endToday")->order('createtime desc')->find();
+        if($newHeart == null) {
+            $data['heart'] = [
+                'rate'  => 0,
+                'time'  => '',
+            ];
+        } else {
+            $data['heart'] = [
+                'rate'  => $newHeart['heart_rate'],
+                'time'  => date('H:i',$newHeart['createtime']),
+            ];
+        }
+
+        $data['heart']['max'] = $heart->where('user_id', $care_id)->where('createtime', 'between', "$beginToday,$endToday")->max('heart_rate');
+        if ($data['heart']['max'] == '0') {
+            $data['heart']['min'] = 0;
+            $data['heart']['avg'] = 0;
+        } else {
+            $data['heart']['min'] = $heart->where('user_id', $care_id)->where('createtime', 'between', "$beginToday,$endToday")->min('heart_rate');
+            $data['heart']['avg'] = $heart->where('user_id', $care_id)->where('createtime', 'between', "$beginToday,$endToday")->avg('heart_rate');
+            $data['heart']['avg'] = round($data['avg']);
+        }
+        $map = new Map();
+        $address = $map->where('user_id',$care_id)->find();
+        if($address == null || $careInfo['is_see'] == 0) {
+            $data['address'] = [];
+        } else {
+            $data['address'] = [
+                'lat'   => $address['lat'],
+                'lng'   => $address['lng'],
+            ];
+        }
+        $data['stepNumber'] = Step::getTodayStepNumber($care_id, time());
+        $this->success('请求成功!',$data);
     }
 
     /**
