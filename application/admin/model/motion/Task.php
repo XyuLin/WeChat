@@ -2,6 +2,7 @@
 
 namespace app\admin\model\motion;
 
+use think\Config;
 use think\Model;
 
 class Task extends Model
@@ -34,6 +35,12 @@ class Task extends Model
         } else {
             return $this->Module->title;
         }
+    }
+
+    public function getUrlAttr($value,$data)
+    {
+        $url = Config::get('url');
+        return empty($value) ? '' : $url .$value;
     }
 
     

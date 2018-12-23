@@ -820,7 +820,7 @@ class User extends Api
         $list = $model->where('care_id',$user['id'])->select();
         $url = Config::get('url');
         foreach ($list as &$value) {
-            $user = \app\common\model\User::get($value['care_id']);
+            $user = \app\common\model\User::get($value['user_id']);
             $value['avatar'] = $url . $user['avatar'];
         }
         unset($value);
@@ -847,6 +847,17 @@ class User extends Api
         if($info['adopt'] != 0) $this->error('不可重复操作!');
         $info->adopt = $operate;
         if($info->save() > 0) {
+            if($operate == '2') {
+                $param = [
+                    'user_id'   => $user->id,
+                    'care_id'   => $id,
+                    'tips'      => $info->tips,
+                    'memo_name' => \app\common\model\User::where('id',$info['user_id'])->value('username'),
+                    'adopt'     => '2',
+                ];
+                $model->create($param);
+            }
+
             $this->success('通过成功!');
         } else {
             $this->error('操作失败!');
