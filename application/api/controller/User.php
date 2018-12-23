@@ -850,7 +850,7 @@ class User extends Api
             if($operate == '2') {
                 $param = [
                     'user_id'   => $user->id,
-                    'care_id'   => $id,
+                    'care_id'   => $info['user_id'],
                     'tips'      => $info->tips,
                     'memo_name' => \app\common\model\User::where('id',$info['user_id'])->value('username'),
                     'adopt'     => '2',
