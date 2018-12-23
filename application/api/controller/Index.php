@@ -62,19 +62,27 @@ class Index extends Api
         $isCry = CryHelp::checkIsCry($user->id);
         $isRescue = Rescue::checkIsRescue($user->id);
         if ($isCry == null && $isRescue != null) {
-            $data['isSignal'] = true;
-            $data['signal'] = [
-                'role' => 'rescue',
-                'cry_id' => $isRescue->cry_id,
-            ];
+            if($isRescue['status'] == '1') {
+                $data['isSignal'] = 3;
+                $data['signal'] = [
+                    'role' => 'rescue', // 未选择
+                    'cry_id' => $isRescue->cry_id,
+                ];
+            } else {
+                $data['isSignal'] = 2;
+                $data['signal'] = [
+                    'role' => 'rescue', // 已接单
+                    'cry_id' => $isRescue->cry_id,
+                ];
+            }
         } elseif ($isRescue == null && $isCry != null) {
-            $data['isSignal'] = true;
+            $data['isSignal'] = 2;
             $data['signal'] = [
                 'role' => 'cry',
                 'cry_id' => $isCry->id,
             ];
         } elseif ($isCry != null && $isRescue != null) {
-            $data['isSignal'] = true;
+            $data['isSignal'] = 2;
             $data['signal'] = [
                 'role' => 'cry',
                 'cry_id' => $isCry->id,
@@ -83,7 +91,7 @@ class Index extends Api
             $isRescue->status = '4';
             $isRescue->save();
         } else {
-            $data['isSignal'] = false;
+            $data['isSignal'] = 1;
             $data['signal'] = [];
         }
 

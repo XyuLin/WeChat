@@ -63,7 +63,7 @@ class Jpush extends Model
                 ];
             }
         }
-        $userArray = ['10'];
+        // $userArray = ['10'];
         try {
             $response = $client->push()
                 ->setPlatform(array('ios', 'android'))
