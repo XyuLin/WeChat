@@ -81,6 +81,7 @@ class CryHelp extends Model
         } else {
             // 完成
             $info->status = '3';
+            $list = $rescue->where('cry_id',$cry_id)->column('id');
             $rescue->where('id','in',$list)->update([
                 'status' => '5', // 完成
             ]);
@@ -126,6 +127,12 @@ class CryHelp extends Model
             'cry'    => [],
             'rescue' => [],
         ];
+
+        if(in_array($info['status'],['3','4'])) {
+            $data['status'] = 'false';
+        } else {
+            $data['status'] = 'true';
+        }
         foreach ($array as $value) {
             if($help_ids[0] == $value['id']) {
                 $data['cry'] = $value;

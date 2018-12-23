@@ -71,7 +71,7 @@ class Rescue extends Model
         if($result == false) {
             return false;
         }
-        return true;
+        return $ids;
     }
 
     // 查看当前状态
@@ -115,7 +115,7 @@ class Rescue extends Model
                 $cryInfo->status = '1';
             }
             // 统计是否已满2名用户接单
-            $count = $this->where('cry_id',$cry_id)->count('id');
+            $count = $this->where('cry_id',$cry_id)->where('status','2')->count('id');
             if($count == '2') {
                 $cryInfo->status = '2';
             }

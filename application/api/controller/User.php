@@ -1123,6 +1123,8 @@ class User extends Api
                     throw new Exception('添加求救信号失败','0');
                 } elseif(is_string($result)) {
                     throw new Exception($result,'0');
+                }elseif(is_array($result)) {
+                    $ids = $result;
                 }
                 // 推送用户
                 $jpush = new Jpush();
@@ -1130,12 +1132,15 @@ class User extends Api
                     'type' => '1',
                     'cry_id' => $cry_id,
                 ];
-                $jpushResult = $jpush->push($ids,'救救我','我快不行了',$extras);
+                if(!empty($ids)) {
+                    $ids = implode(',',$ids);
+                    $ids = explode(',',$ids);
+                    $jpushResult = $jpush->push($ids,'救救我','我快不行了',$extras);
 
-                if($jpushResult['code'] == '0') {
-                    throw new Exception($jpushResult['msg'],'0');
+                    if($jpushResult['code'] == '0') {
+                        throw new Exception($jpushResult['msg'],'0');
+                    }
                 }
-
                 // 提交事务
                 $cryHelp->commit();
                 $rescue->commit();

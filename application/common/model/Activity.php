@@ -21,6 +21,11 @@ class Activity extends Model
     protected $updateTime = 'updatetime';
 
 
+    public function getImageAttr($value)
+    {
+        $url = \think\Config::get('url');
+        return empty($value) ? '' : $url.$value;
+    }
 
     public function getActivityStartAttr($value, $data)
     {
