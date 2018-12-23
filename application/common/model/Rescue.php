@@ -55,7 +55,7 @@ class Rescue extends Model
             if($isEmpty == true) {
                 return '附近未检测到空闲用户!';
             } else {
-                return true;
+                return [];
             }
         }
         $array = [];
