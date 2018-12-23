@@ -1119,7 +1119,7 @@ class User extends Api
                 }
                 $result = $rescue->pushAid($cry_id,$ids);
                 // 如果添加求救信号出错 则回滚数据
-                if($result == false) {
+                if($result === false) {
                     throw new Exception('添加求救信号失败','0');
                 } elseif(is_string($result)) {
                     throw new Exception($result,'0');
