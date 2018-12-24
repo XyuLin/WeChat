@@ -70,6 +70,12 @@ class Api
      */
     public function __construct(Request $request = null)
     {
+        // 跨域布置
+        header('Access-Control-Allow-Origin:*');//允许跨域
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            header('Access-Control-Allow-Headers:x-requested-with,content-type,token');//浏览器页面ajax跨域请求会请求2次，第一次会发送OPTIONS预请求,不进行处理，直接exit返回，但因为下次发送真正的请求头部有带token，所以这里设置允许下次请求头带token否者下次请求无法成功
+            exit("ok");
+        }
         $this->request = is_null($request) ? Request::instance() : $request;
 
         // 控制器初始化
