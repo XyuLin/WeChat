@@ -8,7 +8,6 @@
 
 namespace app\common\model;
 
-use think\Config;
 use think\Model;
 
 class Article extends Model
@@ -158,7 +157,6 @@ class Article extends Model
         unset($item);
         $detail['images'] = $images;
         // 作者信息
-        $url = Config::get('url');
         $detail['author'] = [
             'nickname'  =>  $detail->User->nickname,
             'avatar'    =>  $url . $detail->User->avatar,
