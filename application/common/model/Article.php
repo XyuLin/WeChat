@@ -91,6 +91,7 @@ class Article extends Model
     public function splicingUrl($array = [])
     {
         $url = \think\Config::get('url');
+        $shareUrl = \think\Config::get('shareUrl');
         if(!empty($array)){
             foreach($array as $key => &$value) {
                 $images = explode(',',$value['images']);
@@ -99,6 +100,7 @@ class Article extends Model
                 }
                 unset($item);
                 $value['images'] = $images;
+                $value['shareUrl'] = $shareUrl.$value['id'];
                 $value['user'] = [
                     'nickname' => $value->User->nickname,
                     'avatar'    => $url . $value->User->avatar,
@@ -156,7 +158,6 @@ class Article extends Model
         }
         unset($item);
         $detail['images'] = $images;
-        $detail['shareUrl'] = \think\Config::get('shareUrl') . '?article_id='.$article_id;
         // 作者信息
         $detail['author'] = [
             'nickname'  =>  $detail->User->nickname,
