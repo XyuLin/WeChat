@@ -115,35 +115,7 @@ class Service
             $third->save($values);
             return $auth->direct($user->id);
         } else {
-            // 先随机一个用户名,随后再变更为u+数字id
-            $username = Random::alnum(20);
-            $password = Random::alnum(6);
-
-            Db::startTrans();
-            try {
-                // 默认注册一个会员
-                $result = $auth->register($password, '', [] );
-                if (!$result) {
-                    return FALSE;
-                }
-                $user = $auth->getUser();
-                $fields = ['username' => 'u' . $user->id];
-                // 更新会员资料
-                $user = User::get($user->id);
-                $user->save($fields);
-
-                // 保存第三方信息
-                $values['user_id'] = $user->id;
-                Third::create($values);
-                Db::commit();
-            } catch (PDOException $e) {
-                Db::rollback();
-                $auth->logout();
-                return FALSE;
-            }
-
-            // 写入登录Cookies和Token
-            return $auth->direct($user->id);
+            return false;
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace app\api\controller;
 
+use addons\third\model\Third;
 use app\common\controller\Api;
 use app\common\library\Ems;
 use app\common\library\Sms;
@@ -425,7 +426,39 @@ class User extends Api
             ];
             $this->success(__('Logged in successful'), $data);
         } else {
-            $this->success('授权登录失败!');
+            $this->success('请绑定手机!','','10001');
+        }
+    }
+
+    public function bindThird()
+    {
+        $user = $this->auth->getUser();
+        $openid = $this->request->param('openid');
+        $userid = $user->id;
+
+        $info = Third::where('user_id',$userid)->find();
+        if($info != null) {
+            $this->error('用户已绑定过微信!');
+        }
+        $infoT = Third::where('openid',$openid)->find();
+        if($infoT != null) {
+            $this->error('此微信已绑定过账号!');
+        }
+        $param = [
+            'platform'      => 'wechat',
+            'openid'        => $openid,
+            'openname'      => '',
+            'access_token'  => '',
+            'refresh_token' => '',
+            'expires_in'    => '',
+            'logintime'     => '',
+            'expiretime'    => '',
+        ];
+        $result = Third::create($param);
+        if($result) {
+            $this->success('绑定成功!');
+        } else {
+            $this->error('绑定失败!');
         }
     }
 
