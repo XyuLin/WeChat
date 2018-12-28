@@ -278,4 +278,5 @@ return [
         'api_url'             => 'https://api.fastadmin.net',
     ],
     'url'                     => 'http://49.4.70.109/handring/public',
+    'shareUrl'                => 'http://demo.vlusi.com/shouhuan/article.html',
 ];

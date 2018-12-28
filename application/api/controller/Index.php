@@ -32,7 +32,7 @@ use think\Exception;
 class Index extends Api
 {
 
-    protected $noNeedLogin = ['findUser', 'test', 'jpush', 'testRedis', 'guardRedis'];
+    protected $noNeedLogin = ['findUser', 'test', 'jpush', 'testRedis', 'guardRedis','getArticleDetail'];
     protected $noNeedRight = ['*'];
 
     /**
@@ -173,12 +173,12 @@ class Index extends Api
     // 获取文章详情
     public function getArticleDetail()
     {
-        $user = $this->auth->getUser();
+        // $user = $this->auth->getUser();
         $article_id = $this->request->post('article_id');
         if (empty($article_id)) {
             $this->error('参数不可为空 - article_id');
         }
-        $detail = Article::getArticleDetail($article_id, $user['id']);
+        $detail = Article::getArticleDetail($article_id);
 
         $this->success('请求数据成功', $detail);
     }

@@ -144,7 +144,7 @@ class Article extends Model
     }
 
 
-    public static function getArticleDetail($article_id,$user_id)
+    public static function getArticleDetail($article_id,$user_id = '')
     {
         $detail = self::where('id',$article_id)->find();
         $url = \think\Config::get('url');
@@ -156,19 +156,20 @@ class Article extends Model
         }
         unset($item);
         $detail['images'] = $images;
+        $detail['shareUrl'] = \think\Config::get('shareUrl') . '?article_id='.$article_id;
         // 作者信息
         $detail['author'] = [
             'nickname'  =>  $detail->User->nickname,
             'avatar'    =>  $url . $detail->User->avatar,
         ];
         // 评论信息
-        $detail['comment'] = Comment::isLike($detail->Comment,$user_id);
+        //$detail['comment'] = Comment::isLike($detail->Comment,$user_id);
         // 点赞用户信息
-        $detail['likeUser'] = Like::LikeUser($detail['id']);
+        //$detail['likeUser'] = Like::LikeUser($detail['id']);
         // 判断用户是否收藏，是否点赞，是，是否关注作者
-        $detail['isFollow'] = Follow::isFollow($user_id,$detail['user_id'],'1');
-        $detail['isCollection'] = Collection::isCollection($user_id,$detail['user_id']);
-        $detail['isLike'] = Like::isLike($user_id,$detail['id']);
+        //$detail['isFollow'] = Follow::isFollow($user_id,$detail['user_id'],'1');
+       // $detail['isCollection'] = Collection::isCollection($user_id,$detail['user_id']);
+        //$detail['isLike'] = Like::isLike($user_id,$detail['id']);
         unset($detail->User);
         unset($detail->Comment);
         return $detail;
