@@ -31,6 +31,7 @@ class Step extends Model
             $result = $info->id;
         } else {
             $info->step = $param['step'];
+            $info->calorie = $param['calorie'];
             $result = $info->save();
         }
 
@@ -55,7 +56,7 @@ class Step extends Model
         if($info == null) {
             return 0;
         } else {
-            return $info->step;
+            return $info;
         }
     }
 }

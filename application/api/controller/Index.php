@@ -57,7 +57,9 @@ class Index extends Api
         }
 
         $data['longTask'] = Num::longTask($user->id, time());
-        $data['stepNumber'] = Step::getTodayStepNumber($user->id, time());
+        $step = Step::getTodayStepNumber($user->id, time());
+        $data['stepNumber'] = $step['step'];
+        $data['calorie'] = $step['calorie'];
 
         $isCry = CryHelp::checkIsCry($user->id);
         $isRescue = Rescue::checkIsRescue($user->id);

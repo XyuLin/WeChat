@@ -995,7 +995,10 @@ class User extends Api
                 'lng'   => $address['lng'],
             ];
         }
-        $data['stepNumber'] = Step::getTodayStepNumber($care_id, time());
+        
+        $step = Step::getTodayStepNumber($care_id, time());
+        $data['stepNumber'] = $step['step'];
+        $data['calorie'] = $step['calorie'];
         $this->success('请求成功!',$data);
     }
 
@@ -1064,6 +1067,7 @@ class User extends Api
     {
         $user =  $this->auth->getUser();
         $param['step'] = $this->request->param('step_num/s');
+        $param['calorie']   = $this->request->param('calorie/s');
         $param['user_id'] = $user->id;
 
         $model = new Step();

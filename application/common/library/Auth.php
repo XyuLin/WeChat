@@ -10,6 +10,7 @@ use think\Db;
 use think\Hook;
 use think\Request;
 use think\Validate;
+use app\common\model\Block;
 
 class Auth
 {
@@ -418,6 +419,11 @@ class Auth
         $userinfo = array_intersect_key($data, array_flip($allowFields));
         $userinfo = array_merge($userinfo, Token::get($this->_token));
 
+        if($userinfo['block_category_ids'] != '') {
+            $block = new Block();
+            $names = $block->where('id','in',$userinfo['block_category_ids'])->column('title');
+            $userinfo['block_category_names'] = implode(',',$names);
+        }
         $gender_text = ['0'=>'未选择','1'=>'男','2'=>'女'];
         $blood_type = ['1'=>'A型血','2'=>'B型血','3'=>'AB型血','4'=>'O型血'];
         $url = Config::get('url');
