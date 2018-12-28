@@ -448,6 +448,7 @@ class User extends Api
         $param = [
             'platform'      => $platform,
             'openid'        => $openid,
+            'user_id'       => $userid,
             'openname'      => '',
             'access_token'  => '',
             'refresh_token' => '',
