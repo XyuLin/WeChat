@@ -62,13 +62,14 @@ class Article extends Model
      * @param string $category_id
      * @param string $page
      * @param string $type  1 = 文章  ， 2 = 视频
+     * @param string $user_id
      *
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getHotArticle($category_id = '',$page = '1')
+    public function getHotArticle($category_id = '',$page = '1',$user_id = '1')
     {
         if($category_id != '') {
             $array = $this->where('block_category_id',$category_id)->where('type',$type)->limit('10')->page($page)->order('id desc')->select();
@@ -77,8 +78,9 @@ class Article extends Model
             $array = $this->limit('10')->page($page)->order('id desc')->select();
             $total = $this->count();
         }
-
-        $data['list'] = $this->splicingUrl($array);
+        // 判断用户是否收藏此文章
+        $ids = Collection::where('user_id',$user_id)->column('article_id');
+        $data['list'] = $this->splicingUrl($array,$ids);
         $data['total'] = $total;
         return $data;
     }
@@ -88,7 +90,7 @@ class Article extends Model
      *
      * @return array
      */
-    public function splicingUrl($array = [])
+    public function splicingUrl($array = [],$ids = [])
     {
         $url = \think\Config::get('url');
         $shareUrl = \think\Config::get('shareUrl');
@@ -107,7 +109,13 @@ class Article extends Model
                     'id'        => $value->User->id,
                 ];
                 unset($value['User']);
-
+                if(!empty($ids)) {
+                    if(in_array($value['id'],$ids)) {
+                        $value['isCollection'] = true;
+                    } else {
+                        $value['isCollection'] = false;
+                    }
+                }
             }
             unset($value);
         }
