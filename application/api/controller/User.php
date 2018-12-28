@@ -433,6 +433,7 @@ class User extends Api
     public function bindThird()
     {
         $user = $this->auth->getUser();
+        $platform = $this->request->request("platform");
         $openid = $this->request->param('openid');
         $userid = $user->id;
 
@@ -445,7 +446,7 @@ class User extends Api
             $this->error('此微信已绑定过账号!');
         }
         $param = [
-            'platform'      => 'wechat',
+            'platform'      => $platform,
             'openid'        => $openid,
             'openname'      => '',
             'access_token'  => '',
