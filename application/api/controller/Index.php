@@ -248,7 +248,14 @@ class Index extends Api
     {
         $model = new Activity();
         $city_id = $this->request->param('city_id/s');
-        $list = $model->where('city_id',$city_id)->select();
+        $image = Admin::where('city',$city_id)->value('image');
+        $url = Config::get('url');
+        $imageUrl = $url . $image;
+        $list = collection($model->where('city_id',$city_id)->select())->toArray();
+        foreach ($list as &$value) {
+            $value['adminImage'] = $imageUrl;
+        }
+        unset($value);
         $this->success(
             '请求成功!',$list
         );

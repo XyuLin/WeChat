@@ -37,6 +37,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'email', title: __('Email')},
                         {field: 'city_name', title: __('所在城市')},
                         {field: 'status', title: __("Status"), formatter: Table.api.formatter.status},
+                        {field: 'image', title: __('图片'), formatter: Table.api.formatter.image},
                         {field: 'logintime', title: __('Login time'), formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: function (value, row, index) {
                                 if(row.id == Config.admin.id){
