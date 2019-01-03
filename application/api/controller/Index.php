@@ -226,9 +226,10 @@ class Index extends Api
     // 视频列表
     public function videoList()
     {
+        $user = $this->auth->getUser();
         $model = new Article();
         $page = $this->request->param('page/s');
-        $list = $model->getHotArticle('', $page, '2');
+        $list = $model->getHotArticle('', $page, $user['id']);
         $this->success('请求成功', $list);
     }
 
