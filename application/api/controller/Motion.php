@@ -70,10 +70,14 @@ class Motion extends Api
     {
         $user = $this->auth->getUser();
         $model = new Num();
-        $month = $this->request->param('month/s');
-        $year = $this->request->param('year/s');
+        $month = $this->request->param('month/d');
+        $year = $this->request->param('year/d');
         $result = $model->getUserRecord($user->id,$month,$year);
-        $this->success('请求成功!',$result);
+        if($result == false) {
+            $this->error($model->getError());
+        } else {
+            $this->success('请求成功!',$result);
+        }
     }
 
     public function getTaskInfo()

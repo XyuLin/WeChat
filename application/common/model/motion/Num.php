@@ -62,7 +62,7 @@ class Num extends Model
         }else {
             if(!is_numeric($month) ||  0 > $month || $month < 12) {
                 $this->setCustomError('month - 参数错误!');
-                return $this;
+                return false;
             }
         }
 
