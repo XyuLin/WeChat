@@ -2,6 +2,7 @@
 
 namespace app\common\library;
 
+use app\admin\model\block\Category;
 use app\common\model\User;
 use app\common\model\UserRule;
 use fast\Random;
@@ -10,7 +11,6 @@ use think\Db;
 use think\Hook;
 use think\Request;
 use think\Validate;
-use app\common\model\Block;
 
 class Auth
 {
@@ -420,7 +420,7 @@ class Auth
         $userinfo = array_merge($userinfo, Token::get($this->_token));
 
         if($userinfo['block_category_ids'] != '') {
-            $block = new Block();
+            $block = new Category();
             $names = $block->where('id','in',$userinfo['block_category_ids'])->column('title');
             $userinfo['block_category_names'] = implode(',',$names);
         }
