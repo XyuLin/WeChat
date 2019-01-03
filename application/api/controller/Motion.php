@@ -74,7 +74,7 @@ class Motion extends Api
         $year = $this->request->param('year/d');
         $result = $model->getUserRecord($user->id,$month,$year);
         if($result == false) {
-            $this->error($model->getError());
+            $this->error($model->getCustomError());
         } else {
             $this->success('请求成功!',$result);
         }
