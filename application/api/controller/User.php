@@ -967,14 +967,15 @@ class User extends Api
 
     public function openSee()
     {
-        $user = $this->auth->getUser();
-        if($user['is_see'] == '1') {
-            $user->is_see = 0;
+        $card_id = $this->request->param('care_id/s');
+        $info = Care::get($card_id);
+        if($info['is_see'] == '1') {
+            $info->is_see = 0;
         } else {
-            $user->is_see = '1';
+            $info->is_see = 1;
         }
-        $user->save();
-        $this->success('请求成功!',$user->is_see);
+        $info->save();
+        $this->success('请求成功!',$info->is_see);
     }
 
     /**
@@ -989,7 +990,7 @@ class User extends Api
         if($isTrue == null) {
             $this->error('对方不是您牵挂的人');
         }
-        $careInfo = \app\common\model\User::field('id,username,mobile,is_see,avatar')->find($care_id);
+        $careInfo = \app\common\model\User::field('id,username,mobile,is_see,avatar,go_scene_num,dial_num,rescue_num')->find($care_id);
         $data['user'] = $careInfo;
         $data['user']['memo_name'] = $isTrue['memo_name'];
         $url = Config::get('url');
@@ -1022,7 +1023,9 @@ class User extends Api
         }
         $map = new Map();
         $address = $map->where('user_id',$care_id)->find();
-        if($address == null || $careInfo['is_see'] == 0) {
+        // 判断牵挂的人是否允许我查看他的位置
+        $is_see = Care::where('user_id',$care_id)->where('care_id',$user->id)->value('is_see');
+        if($address == null || $is_see == 0) {
             $data['address'] = [];
         } else {
             $data['address'] = [
@@ -1034,7 +1037,17 @@ class User extends Api
         $step = Step::getTodayStepNumber($care_id, time());
         $data['stepNumber'] = $step['step'];
         $data['calorie'] = $step['calorie'];
+        $data['is_see'] = $isTrue['is_see'];
+        $data['care_id'] = $isTrue['id'];
         $this->success('请求成功!',$data);
+    }
+
+    public function call120()
+    {
+        $user = $this->auth->getUser();
+        $user->dial_num = ['inc','1'];
+        $user->save();
+        $this->success('请求成功');
     }
 
     /**
@@ -1222,6 +1235,8 @@ class User extends Api
         if($info->getCustomError() != '') {
             $this->error($info->getCustomError());
         } else {
+            $user->go_scene_num = ['inc','1'];
+            $user->save();
             $this->success('接单成功!');
         }
 

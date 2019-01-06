@@ -71,7 +71,7 @@ class Num extends Model
         }
 
         $list = $this->where('user_id',$user_id)->where('year',$year)->where('month',$month)->column('id,day');
-
+        
         $list = array_count_values($list);
 
         $days = $this->getMonthLastDay($month,$year);

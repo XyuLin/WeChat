@@ -42,6 +42,10 @@ class CryHelp extends Model
             if($info == null) {
                 // 发出求救信号
                 $info = $this->create($param);
+                // 记录求救次数
+                $userInfo = User::get($user);
+                $userInfo->rescue_num = ['inc','1'];
+                $userInfo->save();
                 $cry_id = $info->id;
             } else {
                 $cry_id = $info->id;
