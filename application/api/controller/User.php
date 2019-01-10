@@ -995,6 +995,13 @@ class User extends Api
         $data['user']['memo_name'] = $isTrue['memo_name'];
         $url = Config::get('url');
         $data['user']['avatar'] = $url.$data['user']['avatar'];
+        $data['user']['age'] = $user['age'];
+        $data['user']['height'] = $user['height'];
+        $data['user']['weight'] = $user['weight'];
+        $gender_text = ['0'=>'未选择','1'=>'男','2'=>'女'];
+        $data['user']['gender'] = $user['gender'];
+        $data['user']['gender_text'] = $gender_text[$user['gender']];
+        // $data['user']['mobile'] = $user['mobile'];
         $heart = new Heart();
         $todayTime = todayTime(time());
         $beginToday = $todayTime['beginTime'];
